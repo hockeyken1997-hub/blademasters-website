@@ -309,7 +309,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAI-U6atVom3DwfUWIhLoRU1G9aHnaaU1Y",
@@ -341,8 +341,7 @@
       try {
         const q = query(
           collection(db, 'blogPosts'),
-          where('status', '==', 'published'),
-          orderBy('publishedAt', 'desc')
+          where('status', '==', 'published')
         );
         const snap = await getDocs(q);
         if (snap.empty) {
@@ -350,10 +349,12 @@
           return;
         }
         grid.innerHTML = '';
-        snap.forEach(docSnap => {
+        const ms = v => (v && typeof v.toMillis === 'function') ? v.toMillis() : (typeof v === 'number' ? v : (v ? Date.parse(v) || 0 : 0));
+        const sortedDocs = snap.docs.slice().sort((a, b) => ms(b.data().publishedAt) - ms(a.data().publishedAt));
+        sortedDocs.forEach(docSnap => {
           const data = docSnap.data();
           const card = document.createElement('a');
-          card.href = '/p/' + encodeURIComponent(docSnap.id);
+          card.href = 'post.html?slug=' + encodeURIComponent(docSnap.id);
           card.className = 'post-card';
           card.innerHTML =
             '<div class="post-card-img">' + (data.emoji || '📝') + '</div>' +
@@ -366,7 +367,8 @@
           grid.appendChild(card);
         });
       } catch (err) {
-        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align:center; color: var(--muted); padding: 30px 0;">Couldn\'t load posts right now. Refresh to try again.</p>';
+        console.error('Blog load failed:', err);
+        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align:center; color: #b00020; padding: 30px 0;">Couldn\'t load posts. Error: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</p>';
       }
     }
 
