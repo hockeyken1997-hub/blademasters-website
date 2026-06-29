@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0c3f5e" />
   <title>Lawn Care & Snow Removal Blog | Blade Masters — Macomb County, MI</title>
   <meta name="description" content="Seasonal lawn care, snow removal, and landscaping tips for homeowners in Shelby Township, Troy, Utica, Sterling Heights, Warren, and Macomb County, Michigan." />
   <meta name="keywords" content="lawn care tips Michigan, when to mow lawn Michigan, fall leaf cleanup Macomb County, snow removal tips Michigan, lawn care blog Shelby Township" />
@@ -309,7 +314,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAI-U6atVom3DwfUWIhLoRU1G9aHnaaU1Y",
@@ -341,7 +346,8 @@
       try {
         const q = query(
           collection(db, 'blogPosts'),
-          where('status', '==', 'published')
+          where('status', '==', 'published'),
+          orderBy('publishedAt', 'desc')
         );
         const snap = await getDocs(q);
         if (snap.empty) {
@@ -349,12 +355,10 @@
           return;
         }
         grid.innerHTML = '';
-        const ms = v => (v && typeof v.toMillis === 'function') ? v.toMillis() : (typeof v === 'number' ? v : (v ? Date.parse(v) || 0 : 0));
-        const sortedDocs = snap.docs.slice().sort((a, b) => ms(b.data().publishedAt) - ms(a.data().publishedAt));
-        sortedDocs.forEach(docSnap => {
+        snap.forEach(docSnap => {
           const data = docSnap.data();
           const card = document.createElement('a');
-          card.href = 'post.html?slug=' + encodeURIComponent(docSnap.id);
+          card.href = '/p/' + encodeURIComponent(docSnap.id);
           card.className = 'post-card';
           card.innerHTML =
             '<div class="post-card-img">' + (data.emoji || '📝') + '</div>' +
@@ -367,8 +371,7 @@
           grid.appendChild(card);
         });
       } catch (err) {
-        console.error('Blog load failed:', err);
-        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align:center; color: #b00020; padding: 30px 0;">Couldn\'t load posts. Error: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</p>';
+        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align:center; color: var(--muted); padding: 30px 0;">Couldn\'t load posts right now. Refresh to try again.</p>';
       }
     }
 
