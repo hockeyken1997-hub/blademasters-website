@@ -1,0 +1,28 @@
+# netlify.toml
+#
+# This file tells Netlify how to build and route your site. The two
+# redirect rules at the bottom are what make the SEO fix work: instead
+# of /blog.html and /p/your-post-slug being plain static files that
+# fetch content via JavaScript, requests to those paths get routed to
+# the Netlify Functions in netlify/functions/, which return complete,
+# already-rendered HTML.
+#
+# Netlify's CDN caches each function's response after the first
+# request (see the Cache-Control header set inside each function), so
+# in practice this behaves like a static file after the first visit —
+# fast for everyone, and immediately readable by Google on first
+# crawl, with no separate "rebuild" step that could silently fail.
+
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[[redirects]]
+  from = "/p/:slug"
+  to = "/.netlify/functions/post"
+  status = 200
+
+[[redirects]]
+  from = "/blog.html"
+  to = "/.netlify/functions/blog"
+  status = 200

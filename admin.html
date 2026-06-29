@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Blog Admin | Blade Masters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #11557c;
+      --navy-dark:  #0c3f5e;
+      --navy-light: #e6f0f7;
+      --teal:       #12828d;
+      --accent:     #a6d066;
+      --accent-dark:#7aab3a;
+      --white:      #ffffff;
+      --off-white:  #f6f8fa;
+      --text:       #1a2530;
+      --muted:      #4a5a6a;
+      --border:     #ccd8e0;
+      --red:        #c0392b;
+      --red-bg:     #fdecea;
+    }
+
+    body { font-family: 'Outfit', sans-serif; background: var(--off-white); color: var(--text); min-height: 100vh; }
+    a { color: inherit; }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--navy-dark); padding: 20px;
+    }
+    .login-card {
+      background: var(--white); border-radius: 16px; padding: 40px 36px;
+      width: 100%; max-width: 380px; text-align: center;
+    }
+    .login-card img { height: 44px; object-fit: contain; margin-bottom: 18px; }
+    .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--navy-dark); letter-spacing: 0.5px; margin-bottom: 6px; }
+    .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .login-card input {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 14px; margin-bottom: 12px; font-family: inherit;
+    }
+    .login-card input:focus { outline: none; border-color: var(--navy); }
+    .login-btn {
+      width: 100%; padding: 13px; background: var(--navy-dark); color: var(--white);
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .login-btn:hover { background: var(--navy); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login-error {
+      background: var(--red-bg); color: var(--red); font-size: 13px; padding: 10px 12px;
+      border-radius: 8px; margin-bottom: 14px; text-align: left; display: none;
+    }
+
+    /* ── ADMIN SHELL ── */
+    #admin-screen { display: none; }
+    .admin-header {
+      background: var(--navy-dark); padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-header-left { display: flex; align-items: center; gap: 14px; }
+    .admin-header img { height: 30px; object-fit: contain; }
+    .admin-header-title { color: var(--white); font-size: 14px; font-weight: 700; }
+    .admin-header-right { display: flex; align-items: center; gap: 14px; }
+    .admin-header-email { color: rgba(255,255,255,0.55); font-size: 12px; }
+    .logout-btn {
+      background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 7px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .admin-main { max-width: 760px; margin: 0 auto; padding: 28px 20px 80px; }
+
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .tab-btn {
+      border: none; background: transparent; padding: 10px 4px; font-size: 14px; font-weight: 600;
+      color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-right: 20px;
+      font-family: inherit;
+    }
+    .tab-btn.active { color: var(--navy-dark); border-bottom-color: var(--navy-dark); }
+
+    /* ── POST LIST ── */
+    .list-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .list-count { font-size: 13px; color: var(--muted); }
+    .new-post-btn {
+      background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .new-post-btn:hover { background: var(--off-white); }
+
+    .post-list { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--white); }
+    .post-row {
+      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+      border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s;
+    }
+    .post-row:last-child { border-bottom: none; }
+    .post-row:hover { background: var(--off-white); }
+    .post-row-icon { font-size: 22px; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--navy-light); flex-shrink: 0; }
+    .post-row-info { flex: 1; min-width: 0; }
+    .post-row-title { font-size: 14px; font-weight: 700; color: var(--navy-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .post-row-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .post-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; flex-shrink: 0; }
+    .post-badge.live { background: #e3f3e1; color: #2e7d32; }
+    .post-badge.draft { background: var(--off-white); border: 1px solid var(--border); color: var(--muted); }
+    .post-row-delete { color: var(--muted); font-size: 13px; padding: 6px; flex-shrink: 0; }
+    .post-row-delete:hover { color: var(--red); }
+    .empty-state { padding: 50px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+
+    /* ── EDITOR ── */
+    .editor-field { margin-bottom: 14px; }
+    .editor-field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+    .editor-field input, .editor-field textarea, .editor-field select {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: inherit; background: var(--white);
+    }
+    .editor-field input:focus, .editor-field textarea:focus { outline: none; border-color: var(--navy); }
+    .title-input { font-size: 18px !important; font-weight: 700; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .editor-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width: 600px) { .editor-row-2 { grid-template-columns: 1fr; } }
+
+    .blocks-section { margin-top: 28px; }
+    .blocks-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 12px; }
+
+    .block {
+      border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px;
+      background: var(--white); position: relative;
+    }
+    .block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .block-head-left { display: flex; align-items: center; gap: 8px; }
+    .block-drag { cursor: grab; color: var(--muted); font-size: 16px; user-select: none; }
+    .block-type-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .block-actions { display: flex; gap: 10px; align-items: center; }
+    .block-action-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 14px; padding: 2px; font-family: inherit; }
+    .block-action-btn:hover { color: var(--navy-dark); }
+    .block-action-btn.danger:hover { color: var(--red); }
+
+    .block textarea, .block input[type=text] {
+      width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px;
+      font-size: 14px; font-family: inherit; resize: vertical;
+    }
+    .block textarea:focus, .block input:focus { outline: none; border-color: var(--navy); }
+    .heading-block input { font-size: 17px; font-weight: 700; }
+    .text-block textarea { min-height: 90px; line-height: 1.55; }
+    .link-row { display: flex; gap: 8px; margin-top: 8px; }
+    .link-row input { font-size: 12px; }
+    .link-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    .photo-upload-zone {
+      border: 1.5px dashed var(--border); border-radius: 8px; padding: 24px;
+      text-align: center; cursor: pointer; transition: border-color 0.15s; background: var(--off-white);
+    }
+    .photo-upload-zone:hover { border-color: var(--navy); }
+    .photo-upload-zone.has-image { padding: 0; border: 1px solid var(--border); overflow: hidden; cursor: default; }
+    .photo-upload-zone img { width: 100%; display: block; max-height: 280px; object-fit: cover; }
+    .upload-icon { font-size: 26px; margin-bottom: 6px; }
+    .upload-text { font-size: 13px; color: var(--muted); }
+    .upload-progress { font-size: 12px; color: var(--navy); margin-top: 8px; }
+
+    .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media(max-width: 500px) { .ba-grid { grid-template-columns: 1fr; } }
+    .ba-col-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+    .ba-upload-zone {
+      border: 1.5px dashed var(--border); border-radius: 8px; padding: 18px 10px;
+      text-align: center; cursor: pointer; aspect-ratio: 4/3; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; transition: border-color 0.15s; background: var(--off-white);
+    }
+    .ba-upload-zone:hover { border-color: var(--navy); }
+    .ba-upload-zone.has-image { padding: 0; border: 1px solid var(--border); position: relative; }
+    .ba-upload-zone img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .add-block-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; margin-bottom: 32px; }
+    .add-block-btn {
+      border: 1.5px dashed var(--border); background: transparent; border-radius: 8px;
+      padding: 9px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; gap: 6px; color: var(--navy-dark);
+    }
+    .add-block-btn:hover { border-color: var(--navy); background: var(--off-white); }
+
+    .editor-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--border); padding-top: 18px; gap: 10px; flex-wrap: wrap;
+    }
+    .editor-footer-left { font-size: 12px; color: var(--muted); }
+    .editor-footer-actions { display: flex; gap: 10px; }
+    .btn-secondary {
+      border: 1px solid var(--border); background: var(--white); border-radius: 8px;
+      padding: 11px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+    .btn-secondary:hover { background: var(--off-white); }
+    .btn-primary {
+      border: none; background: var(--accent); color: var(--navy-dark); border-radius: 8px;
+      padding: 11px 20px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit;
+    }
+    .btn-primary:hover { background: #b8e070; }
+    .btn-primary:disabled, .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .save-status { font-size: 12px; color: var(--accent-dark); font-weight: 600; opacity: 0; transition: opacity 0.3s; }
+    .save-status.show { opacity: 1; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--navy-dark); color: var(--white); padding: 12px 20px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; z-index: 300; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+    .toast.error { background: var(--red); }
+
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(12,63,94,0.45); display: none;
+      align-items: center; justify-content: center; z-index: 400; padding: 20px;
+    }
+    .confirm-overlay.show { display: flex; }
+    .confirm-card { background: var(--white); border-radius: 14px; padding: 24px; max-width: 360px; text-align: center; }
+    .confirm-card p { font-size: 14px; color: var(--text); margin-bottom: 18px; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <img src="logo.png" alt="Blade Masters" />
+      <div class="login-title">Blog admin</div>
+      <p class="login-sub">Sign in to write and publish posts.</p>
+      <div class="login-error" id="login-error"></div>
+      <input type="email" id="login-email" placeholder="Email" autocomplete="username" />
+      <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+      <button class="login-btn" id="login-btn">Sign in</button>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN -->
+  <div id="admin-screen">
+    <div class="admin-header">
+      <div class="admin-header-left">
+        <img src="logo.png" alt="Blade Masters" />
+        <span class="admin-header-title">Blog admin</span>
+      </div>
+      <div class="admin-header-right">
+        <span class="admin-header-email" id="user-email"></span>
+        <button class="logout-btn" id="logout-btn">Log out</button>
+      </div>
+    </div>
+
+    <div class="admin-main">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-list-btn">All posts</button>
+        <button class="tab-btn" id="tab-editor-btn" style="display:none;">Editor</button>
+      </div>
+
+      <!-- POST LIST VIEW -->
+      <div id="view-list">
+        <div class="list-toolbar">
+          <span class="list-count" id="post-count">Loading…</span>
+          <button class="new-post-btn" id="new-post-btn">+ New post</button>
+        </div>
+        <div class="post-list" id="post-list"></div>
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="view-editor" style="display:none;">
+        <div class="editor-field">
+          <label>Title</label>
+          <input type="text" id="field-title" class="title-input" placeholder="When to start mowing your lawn in Michigan" />
+        </div>
+
+        <div class="editor-field">
+          <label>URL slug</label>
+          <input type="text" id="field-slug" placeholder="when-to-start-mowing-lawn-michigan" />
+          <p class="hint">This becomes the page address: blademastersinc.com/p/<span id="slug-preview"></span></p>
+        </div>
+
+        <div class="editor-row-2">
+          <div class="editor-field">
+            <label>Season / category badge</label>
+            <input type="text" id="field-season" placeholder="Spring Lawn Care" />
+          </div>
+          <div class="editor-field">
+            <label>Emoji icon</label>
+            <input type="text" id="field-emoji" placeholder="🌱" maxlength="4" />
+          </div>
+        </div>
+
+        <div class="editor-field">
+          <label>Meta description (for Google search results)</label>
+          <textarea id="field-meta" rows="2" placeholder="A short, plain-language summary for search engines — aim for 1-2 sentences."></textarea>
+        </div>
+
+        <div class="blocks-section">
+          <div class="blocks-label">Content blocks</div>
+          <div id="blocks-container"></div>
+          <div class="add-block-row">
+            <button class="add-block-btn" data-add="heading">+ Heading</button>
+            <button class="add-block-btn" data-add="text">+ Text</button>
+            <button class="add-block-btn" data-add="photo">+ Photo</button>
+            <button class="add-block-btn" data-add="beforeAfter">+ Before / after</button>
+          </div>
+        </div>
+
+        <div class="editor-footer">
+          <span class="editor-footer-left">
+            <span class="save-status" id="save-status">Saved</span>
+          </span>
+          <div class="editor-footer-actions">
+            <button class="btn-secondary" id="back-to-list-btn">Back to all posts</button>
+            <button class="btn-secondary" id="save-draft-btn">Save draft</button>
+            <button class="btn-primary" id="publish-btn">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-card">
+      <p id="confirm-message">Delete this post? This can't be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn-primary" id="confirm-ok" style="background:var(--red); color:#fff;">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc,
+      query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAI-U6atVom3DwfUWIhLoRU1G9aHnaaU1Y",
+      authDomain: "blade-masters.firebaseapp.com",
+      projectId: "blade-masters",
+      storageBucket: "blade-masters.firebasestorage.app",
+      messagingSenderId: "808441867652",
+      appId: "1:808441867652:web:e3d1aa04a489dc598e81d1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // ── DOM refs ──
+    const loginScreen = document.getElementById('login-screen');
+    const adminScreen = document.getElementById('admin-screen');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    const userEmailLabel = document.getElementById('user-email');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    const tabListBtn = document.getElementById('tab-list-btn');
+    const tabEditorBtn = document.getElementById('tab-editor-btn');
+    const viewList = document.getElementById('view-list');
+    const viewEditor = document.getElementById('view-editor');
+    const postListEl = document.getElementById('post-list');
+    const postCountEl = document.getElementById('post-count');
+    const newPostBtn = document.getElementById('new-post-btn');
+    const backToListBtn = document.getElementById('back-to-list-btn');
+
+    const fieldTitle = document.getElementById('field-title');
+    const fieldSlug = document.getElementById('field-slug');
+    const fieldSeason = document.getElementById('field-season');
+    const fieldEmoji = document.getElementById('field-emoji');
+    const fieldMeta = document.getElementById('field-meta');
+    const slugPreview = document.getElementById('slug-preview');
+    const blocksContainer = document.getElementById('blocks-container');
+    const saveDraftBtn = document.getElementById('save-draft-btn');
+    const publishBtn = document.getElementById('publish-btn');
+    const saveStatus = document.getElementById('save-status');
+    const toast = document.getElementById('toast');
+
+    const confirmOverlay = document.getElementById('confirm-overlay');
+    const confirmMessage = document.getElementById('confirm-message');
+    const confirmCancel = document.getElementById('confirm-cancel');
+    const confirmOk = document.getElementById('confirm-ok');
+
+    // ── State ──
+    let currentPostId = null;
+    let currentStatus = 'draft';
+    let blocks = [];
+    let blockIdCounter = 0;
+
+    function showToast(message, isError) {
+      toast.textContent = message;
+      toast.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(() => { toast.className = 'toast'; }, 2600);
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+
+    fieldTitle.addEventListener('input', () => {
+      if (!currentPostId || fieldSlug.dataset.autofilled !== 'false') {
+        fieldSlug.value = slugify(fieldTitle.value);
+        slugPreview.textContent = fieldSlug.value;
+      }
+    });
+    fieldSlug.addEventListener('input', () => {
+      fieldSlug.dataset.autofilled = 'false';
+      slugPreview.textContent = fieldSlug.value;
+    });
+
+    // ── Auth ──
+    loginBtn.addEventListener('click', doLogin);
+    loginPassword.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    function doLogin() {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+      if (!email || !password) {
+        loginError.textContent = 'Enter your email and password.';
+        loginError.style.display = 'block';
+        return;
+      }
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in…';
+      loginError.style.display = 'none';
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => {
+          loginError.textContent = 'Couldn\'t sign in. Check your email and password and try again.';
+          loginError.style.display = 'block';
+        })
+        .finally(() => {
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Sign in';
+        });
+    }
+
+    logoutBtn.addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginScreen.style.display = 'none';
+        adminScreen.style.display = 'block';
+        userEmailLabel.textContent = user.email;
+        loadPostList();
+      } else {
+        loginScreen.style.display = 'flex';
+        adminScreen.style.display = 'none';
+        loginEmail.value = '';
+        loginPassword.value = '';
+      }
+    });
+
+    // ── Tab switching ──
+    function showListView() {
+      viewList.style.display = 'block';
+      viewEditor.style.display = 'none';
+      tabListBtn.classList.add('active');
+      tabEditorBtn.classList.remove('active');
+      tabEditorBtn.style.display = 'none';
+      loadPostList();
+    }
+    function showEditorView() {
+      viewList.style.display = 'none';
+      viewEditor.style.display = 'block';
+      tabListBtn.classList.remove('active');
+      tabEditorBtn.classList.add('active');
+      tabEditorBtn.style.display = 'inline-block';
+    }
+    tabListBtn.addEventListener('click', showListView);
+    tabEditorBtn.addEventListener('click', showEditorView);
+    backToListBtn.addEventListener('click', showListView);
+
+    // ── Post list ──
+    async function loadPostList() {
+      postListEl.innerHTML = '';
+      postCountEl.textContent = 'Loading…';
+      try {
+        const q = query(collection(db, 'blogPosts'), orderBy('updatedAt', 'desc'));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          postListEl.innerHTML = '<div class="empty-state">No posts yet. Click "New post" to write your first one.</div>';
+          postCountEl.textContent = '0 posts';
+          return;
+        }
+        postCountEl.textContent = snap.size + (snap.size === 1 ? ' post' : ' posts');
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          const row = document.createElement('div');
+          row.className = 'post-row';
+          const updated = data.updatedAt && data.updatedAt.toDate
+            ? data.updatedAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '';
+          row.innerHTML =
+            '<div class="post-row-icon">' + (data.emoji || '📝') + '</div>' +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escapeHtml(data.title || 'Untitled') + '</div>' +
+              '<div class="post-row-meta">' + (data.status === 'published' ? 'Published' : 'Draft') + (updated ? ' · ' + updated : '') + '</div>' +
+            '</div>' +
+            '<span class="post-badge ' + (data.status === 'published' ? 'live' : 'draft') + '">' + (data.status === 'published' ? 'Live' : 'Draft') + '</span>' +
+            '<span class="post-row-delete" data-id="' + docSnap.id + '">✕</span>';
+          row.addEventListener('click', e => {
+            if (e.target.classList.contains('post-row-delete')) return;
+            openPostForEdit(docSnap.id, data);
+          });
+          row.querySelector('.post-row-delete').addEventListener('click', e => {
+            e.stopPropagation();
+            confirmDelete(docSnap.id, data.title);
+          });
+          postListEl.appendChild(row);
+        });
+      } catch (err) {
+        postListEl.innerHTML = '<div class="empty-state">Couldn\'t load posts. Refresh the page to try again.</div>';
+        postCountEl.textContent = '';
+      }
+    }
+
+    function confirmDelete(id, title) {
+      confirmMessage.textContent = 'Delete "' + (title || 'this post') + '"? This can\'t be undone.';
+      confirmOverlay.classList.add('show');
+      confirmOk.onclick = async () => {
+        confirmOverlay.classList.remove('show');
+        try {
+          await deleteDoc(doc(db, 'blogPosts', id));
+          showToast('Post deleted');
+          loadPostList();
+        } catch (err) {
+          showToast('Couldn\'t delete that post. Try again.', true);
+        }
+      };
+    }
+    confirmCancel.addEventListener('click', () => confirmOverlay.classList.remove('show'));
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── New / edit post ──
+    newPostBtn.addEventListener('click', () => {
+      currentPostId = null;
+      currentStatus = 'draft';
+      fieldTitle.value = '';
+      fieldSlug.value = '';
+      fieldSlug.dataset.autofilled = 'true';
+      slugPreview.textContent = '';
+      fieldSeason.value = '';
+      fieldEmoji.value = '';
+      fieldMeta.value = '';
+      blocks = [];
+      renderBlocks();
+      showEditorView();
+    });
+
+    async function openPostForEdit(id, data) {
+      currentPostId = id;
+      currentStatus = data.status || 'draft';
+      fieldTitle.value = data.title || '';
+      fieldSlug.value = data.slug || '';
+      fieldSlug.dataset.autofilled = 'false';
+      slugPreview.textContent = fieldSlug.value;
+      fieldSeason.value = data.seasonBadge || '';
+      fieldEmoji.value = data.emoji || '';
+      fieldMeta.value = data.metaDescription || '';
+      blocks = (data.blocks || []).map(b => ({ ...b, _id: 'b' + (blockIdCounter++) }));
+      renderBlocks();
+      showEditorView();
+    }
+
+    // ── Blocks ──
+    document.querySelectorAll('.add-block-btn').forEach(btn => {
+      btn.addEventListener('click', () => addBlock(btn.dataset.add));
+    });
+
+    function addBlock(type) {
+      const id = 'b' + (blockIdCounter++);
+      if (type === 'heading') blocks.push({ _id: id, type: 'heading', text: '' });
+      if (type === 'text') blocks.push({ _id: id, type: 'text', text: '', linkText: '', linkUrl: '' });
+      if (type === 'photo') blocks.push({ _id: id, type: 'photo', url: '', caption: '' });
+      if (type === 'beforeAfter') blocks.push({ _id: id, type: 'beforeAfter', beforeUrl: '', afterUrl: '' });
+      renderBlocks();
+    }
+
+    function removeBlock(id) {
+      blocks = blocks.filter(b => b._id !== id);
+      renderBlocks();
+    }
+
+    function moveBlock(id, direction) {
+      const idx = blocks.findIndex(b => b._id === id);
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= blocks.length) return;
+      [blocks[idx], blocks[newIdx]] = [blocks[newIdx], blocks[idx]];
+      renderBlocks();
+    }
+
+    function renderBlocks() {
+      blocksContainer.innerHTML = '';
+      blocks.forEach((block, index) => {
+        const el = document.createElement('div');
+        el.className = 'block ' + block.type + '-block';
+
+        const typeLabels = { heading: 'Heading', text: 'Text', photo: 'Photo', beforeAfter: 'Before / after' };
+
+        let bodyHtml = '';
+        if (block.type === 'heading') {
+          bodyHtml = '<input type="text" placeholder="A short heading for this section" value="' + escapeAttr(block.text) + '" data-field="text" />';
+        } else if (block.type === 'text') {
+          bodyHtml =
+            '<textarea placeholder="Write a paragraph here. Keep it conversational and useful." data-field="text">' + escapeHtml(block.text) + '</textarea>' +
+            '<div class="link-row">' +
+              '<input type="text" placeholder="Link text (optional)" value="' + escapeAttr(block.linkText || '') + '" data-field="linkText" style="flex:1;" />' +
+              '<input type="text" placeholder="https://..." value="' + escapeAttr(block.linkUrl || '') + '" data-field="linkUrl" style="flex:2;" />' +
+            '</div>' +
+            '<p class="link-hint">Add link text and a URL to turn part of this paragraph into a clickable link — useful for linking to a service page or another post.</p>';
+        } else if (block.type === 'photo') {
+          bodyHtml =
+            '<div class="photo-upload-zone' + (block.url ? ' has-image' : '') + '" data-upload="single">' +
+              (block.url
+                ? '<img src="' + block.url + '" alt="" />'
+                : '<div><div class="upload-icon">📷</div><div class="upload-text">Click to upload a photo</div></div>') +
+            '</div>' +
+            '<input type="file" accept="image/*" style="display:none;" data-fileinput="single" />' +
+            '<div class="upload-progress" data-progress style="display:none;">Uploading…</div>' +
+            '<input type="text" placeholder="Caption (optional)" value="' + escapeAttr(block.caption || '') + '" data-field="caption" style="margin-top:8px;" />';
+        } else if (block.type === 'beforeAfter') {
+          bodyHtml =
+            '<div class="ba-grid">' +
+              '<div>' +
+                '<div class="ba-col-label">Before</div>' +
+                '<div class="ba-upload-zone' + (block.beforeUrl ? ' has-image' : '') + '" data-upload="before">' +
+                  (block.beforeUrl ? '<img src="' + block.beforeUrl + '" alt="" />' : '<div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div>') +
+                '</div>' +
+                '<input type="file" accept="image/*" style="display:none;" data-fileinput="before" />' +
+              '</div>' +
+              '<div>' +
+                '<div class="ba-col-label">After</div>' +
+                '<div class="ba-upload-zone' + (block.afterUrl ? ' has-image' : '') + '" data-upload="after">' +
+                  (block.afterUrl ? '<img src="' + block.afterUrl + '" alt="" />' : '<div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div>') +
+                '</div>' +
+                '<input type="file" accept="image/*" style="display:none;" data-fileinput="after" />' +
+              '</div>' +
+            '</div>' +
+            '<div class="upload-progress" data-progress style="display:none;">Uploading…</div>';
+        }
+
+        el.innerHTML =
+          '<div class="block-head">' +
+            '<div class="block-head-left">' +
+              '<span class="block-drag">⠿</span>' +
+              '<span class="block-type-label">' + typeLabels[block.type] + '</span>' +
+            '</div>' +
+            '<div class="block-actions">' +
+              (index > 0 ? '<button class="block-action-btn" data-move="up">↑</button>' : '') +
+              (index < blocks.length - 1 ? '<button class="block-action-btn" data-move="down">↓</button>' : '') +
+              '<button class="block-action-btn danger" data-remove>✕</button>' +
+            '</div>' +
+          '</div>' +
+          bodyHtml;
+
+        // Wire up text fields
+        el.querySelectorAll('[data-field]').forEach(input => {
+          input.addEventListener('input', () => {
+            block[input.dataset.field] = input.value;
+          });
+        });
+
+        // Wire up move/remove
+        const removeBtn = el.querySelector('[data-remove]');
+        if (removeBtn) removeBtn.addEventListener('click', () => removeBlock(block._id));
+        el.querySelectorAll('[data-move]').forEach(btn => {
+          btn.addEventListener('click', () => moveBlock(block._id, btn.dataset.move === 'up' ? -1 : 1));
+        });
+
+        // Wire up uploads
+        if (block.type === 'photo') {
+          wireUpload(el, '[data-upload="single"]', '[data-fileinput="single"]', url => {
+            block.url = url;
+            renderBlocks();
+          });
+        } else if (block.type === 'beforeAfter') {
+          wireUpload(el, '[data-upload="before"]', '[data-fileinput="before"]', url => {
+            block.beforeUrl = url;
+            renderBlocks();
+          });
+          wireUpload(el, '[data-upload="after"]', '[data-fileinput="after"]', url => {
+            block.afterUrl = url;
+            renderBlocks();
+          });
+        }
+
+        blocksContainer.appendChild(el);
+      });
+    }
+
+    function escapeAttr(str) {
+      return (str || '').replace(/"/g, '&quot;');
+    }
+
+    function wireUpload(container, zoneSelector, inputSelector, onDone) {
+      const zone = container.querySelector(zoneSelector);
+      const fileInput = container.querySelector(inputSelector);
+      const progressEl = container.querySelector('[data-progress]');
+      zone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+          showToast('That image is too large. Keep photos under 10MB.', true);
+          return;
+        }
+        if (progressEl) progressEl.style.display = 'block';
+        try {
+          const path = 'blog-images/' + Date.now() + '-' + file.name.replace(/[^\w.\-]/g, '_');
+          const storageRef = ref(storage, path);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          onDone(url);
+          showToast('Photo uploaded');
+        } catch (err) {
+          showToast('Upload failed. Check your connection and try again.', true);
+        } finally {
+          if (progressEl) progressEl.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Save / publish ──
+    saveDraftBtn.addEventListener('click', () => savePost('draft'));
+    publishBtn.addEventListener('click', () => savePost('published'));
+
+    async function savePost(status) {
+      const title = fieldTitle.value.trim();
+      const slug = fieldSlug.value.trim();
+      if (!title) {
+        showToast('Give the post a title before saving.', true);
+        return;
+      }
+      if (!slug) {
+        showToast('The post needs a URL slug before saving.', true);
+        return;
+      }
+
+      saveDraftBtn.disabled = true;
+      publishBtn.disabled = true;
+      const cleanBlocks = blocks.map(b => {
+        const copy = { ...b };
+        delete copy._id;
+        return copy;
+      });
+
+      const postData = {
+        title,
+        slug,
+        seasonBadge: fieldSeason.value.trim(),
+        emoji: fieldEmoji.value.trim() || '📝',
+        metaDescription: fieldMeta.value.trim(),
+        blocks: cleanBlocks,
+        status,
+        updatedAt: serverTimestamp()
+      };
+      if (status === 'published' && currentStatus !== 'published') {
+        postData.publishedAt = serverTimestamp();
+      }
+
+      try {
+        if (currentPostId) {
+          await setDoc(doc(db, 'blogPosts', currentPostId), postData, { merge: true });
+        } else {
+          const newId = slug;
+          const existing = await getDoc(doc(db, 'blogPosts', newId));
+          if (existing.exists()) {
+            showToast('That URL slug is already used by another post. Change it and try again.', true);
+            saveDraftBtn.disabled = false;
+            publishBtn.disabled = false;
+            return;
+          }
+          postData.createdAt = serverTimestamp();
+          await setDoc(doc(db, 'blogPosts', newId), postData);
+          currentPostId = newId;
+        }
+        currentStatus = status;
+        showToast(status === 'published' ? 'Post published' : 'Draft saved');
+        saveStatus.textContent = status === 'published' ? 'Published' : 'Saved';
+        saveStatus.classList.add('show');
+        setTimeout(() => saveStatus.classList.remove('show'), 2000);
+      } catch (err) {
+        showToast('Couldn\'t save. Check your connection and try again.', true);
+      } finally {
+        saveDraftBtn.disabled = false;
+        publishBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
