@@ -256,10 +256,21 @@
 
     /* ── TESTIMONIALS ── */
     .testimonials-section { background: var(--navy-dark); }
-    .testimonials-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
-      gap: 16px; margin-top: 44px;
-    }
+    .testimonials-carousel { position: relative; max-width: 660px; margin: 44px auto 0; padding: 0 52px; }
+    .tc-viewport { overflow: hidden; }
+    .tc-track { display: flex; transition: transform 0.5s ease; }
+    .tc-track > .testimonial-card { flex: 0 0 100%; margin: 0; box-sizing: border-box; }
+    .tc-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; transition: background 0.15s, border-color 0.15s; }
+    .tc-arrow:hover { background: var(--accent); border-color: var(--accent); color: var(--navy-dark); }
+    .tc-arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .tc-prev { left: 0; }
+    .tc-next { right: 0; }
+    .tc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 22px; }
+    .tc-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25); border: none; padding: 0; cursor: pointer; transition: all 0.2s; }
+    .tc-dot.active { background: var(--accent); width: 22px; border-radius: 4px; }
+    @media (max-width: 560px) { .testimonials-carousel { padding: 0 40px; } .tc-arrow { width: 34px; height: 34px; } .tc-arrow svg { width: 18px; height: 18px; } }
     .testimonial-card {
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px; padding: 26px 24px;
@@ -709,37 +720,44 @@ color:#0c3f5e;
       <div class="section-label" style="color:rgba(166,208,102,0.8);">What Clients Say</div>
       <h2 class="section-title" style="color:#fff;">Real Reviews</h2>
       <p class="section-sub" style="color:rgba(255,255,255,0.6);">Here's what a few of our customers have to say.</p>
-      <div class="testimonials-grid">
-        <div class="testimonial-card reveal">
+      <div class="testimonials-carousel" id="reviewsCarousel">
+        <button class="tc-arrow tc-prev" type="button" aria-label="Previous review"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="tc-viewport">
+          <div class="tc-track" id="reviewsTrack">
+        <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Blade Masters has been taking care of my lawn for two seasons now and I couldn't be happier. Always on time, always thorough. My yard looks better than it ever has."</p>
           <div class="testimonial-author">Mike T.</div>
           <div class="testimonial-loc">Sterling Heights, MI</div>
         </div>
-        <div class="testimonial-card reveal">
+        <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Called them for snow removal after a big storm and they were at my driveway before I even had my coffee. Super fast, professional, and reasonably priced. Highly recommend."</p>
           <div class="testimonial-author">Sandra K.</div>
           <div class="testimonial-loc">Warren, MI</div>
         </div>
-        <div class="testimonial-card reveal">
+        <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Got a quote the same day I reached out and they were working on my bushes two days later. Clean, professional, and the yard looks amazing. Will definitely use them again."</p>
           <div class="testimonial-author">James R.</div>
           <div class="testimonial-loc">Clinton Township, MI</div>
         </div>
-        <div class="testimonial-card reveal">
+        <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Best lawn care service in Shelby Township. Reliable every single week, my grass looks incredible. Neighbors keep asking who does my yard."</p>
           <div class="testimonial-author">Dave M.</div>
           <div class="testimonial-loc">Shelby Township, MI</div>
         </div>
-        <div class="testimonial-card reveal">
+        <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"I've tried three other lawn services in Troy and none of them come close to Blade Masters. Punctual, thorough, and the price is right. Locked in for the season."</p>
           <div class="testimonial-author">Lisa W.</div>
           <div class="testimonial-loc">Troy, MI</div>
         </div>
+          </div>
+        </div>
+        <button class="tc-arrow tc-next" type="button" aria-label="Next review"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div class="tc-dots" id="reviewsDots"></div>
       </div>
     </div>
   </section>
@@ -1041,8 +1059,8 @@ color:#0c3f5e;
     //    cards below if Firestore has none or can't be reached, so the
     //    section is never empty and stays search-engine friendly. ──
     (async function renderReviews() {
-      const grid = document.querySelector('.testimonials-grid');
-      if (!grid) return;
+      const track = document.getElementById('reviewsTrack');
+      if (!track) return;
       const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
       try {
         const snap = await getDocs(query(collection(db, 'reviews'), where('active', '==', true)));
@@ -1050,19 +1068,67 @@ color:#0c3f5e;
         const arr = [];
         snap.forEach(d => arr.push(d.data()));
         arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-        grid.innerHTML = arr.map(r => {
+        track.innerHTML = arr.map(r => {
           const n = Math.max(1, Math.min(5, parseInt(r.rating, 10) || 5));
-          return '<div class="testimonial-card reveal visible">'
+          return '<div class="testimonial-card">'
             + '<div class="stars">' + '\u2605'.repeat(n) + '</div>'
             + '<p class="testimonial-text">"' + esc(r.text) + '"</p>'
             + '<div class="testimonial-author">' + esc(r.name) + '</div>'
             + (r.location ? '<div class="testimonial-loc">' + esc(r.location) + '</div>' : '')
             + '</div>';
         }).join('');
+        initReviewsCarousel();
       } catch (e) {
         /* permission denied / offline: keep the built-in fallback cards */
       }
     })();
+
+    // Testimonials carousel: auto-advance + manual arrows + dots
+    let _rcTimer = null;
+    function initReviewsCarousel() {
+      const root = document.getElementById('reviewsCarousel');
+      if (!root) return;
+      const track = document.getElementById('reviewsTrack');
+      const dotsWrap = document.getElementById('reviewsDots');
+      const prev = root.querySelector('.tc-prev');
+      const next = root.querySelector('.tc-next');
+      const slides = [...track.children];
+      const n = slides.length;
+      if (_rcTimer) { clearInterval(_rcTimer); _rcTimer = null; }
+      dotsWrap.innerHTML = '';
+      if (n === 0) return;
+      const many = n > 1;
+      prev.style.display = next.style.display = many ? 'flex' : 'none';
+      let i = 0;
+      const dots = [];
+      function go(idx) {
+        i = (idx + n) % n;
+        track.style.transform = 'translateX(-' + (i * 100) + '%)';
+        dots.forEach((d, k) => d.classList.toggle('active', k === i));
+      }
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function start() { if (many && !reduce) _rcTimer = setInterval(() => go(i + 1), 6000); }
+      function stop() { if (_rcTimer) { clearInterval(_rcTimer); _rcTimer = null; } }
+      function restart() { stop(); start(); }
+      if (many) {
+        slides.forEach((_, idx) => {
+          const d = document.createElement('button');
+          d.type = 'button';
+          d.className = 'tc-dot' + (idx === 0 ? ' active' : '');
+          d.setAttribute('aria-label', 'Go to review ' + (idx + 1));
+          d.addEventListener('click', () => { go(idx); restart(); });
+          dotsWrap.appendChild(d);
+          dots.push(d);
+        });
+      }
+      prev.onclick = () => { go(i - 1); restart(); };
+      next.onclick = () => { go(i + 1); restart(); };
+      root.onmouseenter = stop;
+      root.onmouseleave = start;
+      go(0);
+      start();
+    }
+    initReviewsCarousel();
 
     // Checkbox style
     document.querySelectorAll('.service-check input[type="checkbox"]').forEach(cb => {
