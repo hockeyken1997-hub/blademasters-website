@@ -234,6 +234,7 @@
     .post-row.rev-inactive { opacity: 0.55; }
     .rev-active-label { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
     .rev-active-label input { width: auto; margin: 0; }
+    .gal-thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -269,6 +270,7 @@
         <button class="tab-btn active" id="tab-list-btn">All posts</button>
         <button class="tab-btn" id="tab-editor-btn" style="display:none;">Editor</button>
         <button class="tab-btn" id="tab-reviews-btn">Reviews</button>
+        <button class="tab-btn" id="tab-gallery-btn">Before / After</button>
       </div>
 
       <!-- POST LIST VIEW -->
@@ -380,6 +382,54 @@
           </div>
         </div>
       </div>
+
+      <!-- BEFORE / AFTER GALLERY VIEW -->
+      <div id="view-gallery" style="display:none;">
+        <div class="list-toolbar">
+          <span class="list-count" id="gallery-count">Loading…</span>
+          <button class="new-post-btn" id="new-gallery-btn">+ New project</button>
+        </div>
+        <div class="post-list" id="gallery-list"></div>
+
+        <div id="gallery-editor" class="review-editor" style="display:none;">
+          <div class="editor-field">
+            <label>Project title</label>
+            <input type="text" id="gal-title" placeholder="Full backyard makeover — Shelby Township" />
+          </div>
+          <div class="editor-field">
+            <label>Service (optional)</label>
+            <input type="text" id="gal-service" placeholder="Landscape Install" />
+          </div>
+          <div class="ba-grid">
+            <div>
+              <div class="ba-col-label">Before</div>
+              <div class="ba-upload-zone" data-upload="galbefore"><div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div></div>
+              <input type="file" accept="image/*" style="display:none;" data-fileinput="galbefore" />
+            </div>
+            <div>
+              <div class="ba-col-label">After</div>
+              <div class="ba-upload-zone" data-upload="galafter"><div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div></div>
+              <input type="file" accept="image/*" style="display:none;" data-fileinput="galafter" />
+            </div>
+          </div>
+          <div class="upload-progress" data-progress style="display:none;">Uploading…</div>
+          <div class="editor-row-2">
+            <div class="editor-field">
+              <label>Display order</label>
+              <input type="number" id="gal-order" placeholder="1" />
+            </div>
+            <div class="editor-field">
+              <label class="rev-active-label"><input type="checkbox" id="gal-active" checked /> Show on website</label>
+            </div>
+          </div>
+          <div class="editor-footer">
+            <div class="editor-footer-actions">
+              <button class="btn-secondary" id="gal-cancel-btn">Cancel</button>
+              <button class="btn-primary" id="gal-save-btn">Save project</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -474,6 +524,23 @@
     const revSaveBtn = document.getElementById('rev-save-btn');
     const revCancelBtn = document.getElementById('rev-cancel-btn');
 
+    // Gallery refs
+    const tabGalleryBtn = document.getElementById('tab-gallery-btn');
+    const viewGallery = document.getElementById('view-gallery');
+    const galleryListEl = document.getElementById('gallery-list');
+    const galleryCountEl = document.getElementById('gallery-count');
+    const newGalleryBtn = document.getElementById('new-gallery-btn');
+    const galleryEditor = document.getElementById('gallery-editor');
+    const galTitle = document.getElementById('gal-title');
+    const galService = document.getElementById('gal-service');
+    const galOrder = document.getElementById('gal-order');
+    const galActive = document.getElementById('gal-active');
+    const galSaveBtn = document.getElementById('gal-save-btn');
+    const galCancelBtn = document.getElementById('gal-cancel-btn');
+    let currentGalleryId = null;
+    let galBeforeUrl = '';
+    let galAfterUrl = '';
+
     // ── State ──
     let currentPostId = null;
     let currentReviewId = null;
@@ -552,35 +619,55 @@
       viewList.style.display = 'block';
       viewEditor.style.display = 'none';
       viewReviews.style.display = 'none';
+      viewGallery.style.display = 'none';
       tabListBtn.classList.add('active');
       tabEditorBtn.classList.remove('active');
       tabEditorBtn.style.display = 'none';
       tabReviewsBtn.classList.remove('active');
+      tabGalleryBtn.classList.remove('active');
       loadPostList();
     }
     function showEditorView() {
       viewList.style.display = 'none';
       viewEditor.style.display = 'block';
       viewReviews.style.display = 'none';
+      viewGallery.style.display = 'none';
       tabListBtn.classList.remove('active');
       tabEditorBtn.classList.add('active');
       tabEditorBtn.style.display = 'inline-block';
       tabReviewsBtn.classList.remove('active');
+      tabGalleryBtn.classList.remove('active');
     }
     function showReviewsView() {
       viewList.style.display = 'none';
       viewEditor.style.display = 'none';
       viewReviews.style.display = 'block';
+      viewGallery.style.display = 'none';
       reviewEditor.style.display = 'none';
       tabListBtn.classList.remove('active');
       tabEditorBtn.classList.remove('active');
       tabEditorBtn.style.display = 'none';
       tabReviewsBtn.classList.add('active');
+      tabGalleryBtn.classList.remove('active');
       loadReviews();
+    }
+    function showGalleryView() {
+      viewList.style.display = 'none';
+      viewEditor.style.display = 'none';
+      viewReviews.style.display = 'none';
+      viewGallery.style.display = 'block';
+      galleryEditor.style.display = 'none';
+      tabListBtn.classList.remove('active');
+      tabEditorBtn.classList.remove('active');
+      tabEditorBtn.style.display = 'none';
+      tabReviewsBtn.classList.remove('active');
+      tabGalleryBtn.classList.add('active');
+      loadGallery();
     }
     tabListBtn.addEventListener('click', showListView);
     tabEditorBtn.addEventListener('click', showEditorView);
     tabReviewsBtn.addEventListener('click', showReviewsView);
+    tabGalleryBtn.addEventListener('click', showGalleryView);
     backToListBtn.addEventListener('click', showListView);
 
     // ── Post list ──
@@ -749,6 +836,103 @@
         } catch (err) {
           showToast('Couldn\'t delete that review. Try again.', true);
         }
+      };
+    }
+
+    // ── Before/After gallery ──
+    function setGalZone(sel, url) {
+      const zone = galleryEditor.querySelector(sel);
+      if (!zone) return;
+      if (url) { zone.classList.add('has-image'); zone.innerHTML = '<img src="' + url + '" alt="" />'; }
+      else { zone.classList.remove('has-image'); zone.innerHTML = '<div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div>'; }
+    }
+    wireUpload(galleryEditor, '[data-upload="galbefore"]', '[data-fileinput="galbefore"]', url => { galBeforeUrl = url; setGalZone('[data-upload="galbefore"]', url); });
+    wireUpload(galleryEditor, '[data-upload="galafter"]', '[data-fileinput="galafter"]', url => { galAfterUrl = url; setGalZone('[data-upload="galafter"]', url); });
+
+    async function loadGallery() {
+      galleryListEl.innerHTML = '';
+      galleryCountEl.textContent = 'Loading…';
+      try {
+        const snap = await getDocs(query(collection(db, 'gallery'), orderBy('order', 'asc')));
+        if (snap.empty) {
+          galleryListEl.innerHTML = '<div class="empty-state">No projects yet. Click "New project" to add your first before/after.</div>';
+          galleryCountEl.textContent = '0 projects';
+          return;
+        }
+        galleryCountEl.textContent = snap.size + (snap.size === 1 ? ' project' : ' projects');
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const row = document.createElement('div');
+          row.className = 'post-row' + (d.active === false ? ' rev-inactive' : '');
+          row.innerHTML =
+            (d.afterUrl ? '<img class="gal-thumb" src="' + d.afterUrl + '" alt="" />' : '<div class="post-row-icon">🖼️</div>') +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escapeHtml(d.title || 'Untitled project') + '</div>' +
+              '<div class="post-row-meta">' + escapeHtml(d.service || 'Before / after') + '</div>' +
+            '</div>' +
+            '<span class="post-badge ' + (d.active === false ? 'draft' : 'live') + '">' + (d.active === false ? 'Hidden' : 'Shown') + '</span>' +
+            '<span class="post-row-delete" data-id="' + docSnap.id + '">✕</span>';
+          row.addEventListener('click', e => { if (e.target.classList.contains('post-row-delete')) return; openGalleryForEdit(docSnap.id, d); });
+          row.querySelector('.post-row-delete').addEventListener('click', e => { e.stopPropagation(); confirmDeleteGallery(docSnap.id, d.title); });
+          galleryListEl.appendChild(row);
+        });
+      } catch (err) {
+        galleryListEl.innerHTML = '<div class="empty-state">Couldn\'t load projects. Refresh the page to try again.</div>';
+        galleryCountEl.textContent = '';
+      }
+    }
+    function openGalleryEditor() { galleryEditor.style.display = 'block'; galleryEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    newGalleryBtn.addEventListener('click', () => {
+      currentGalleryId = null;
+      galBeforeUrl = ''; galAfterUrl = '';
+      galTitle.value = ''; galService.value = ''; galActive.checked = true;
+      galOrder.value = galleryListEl.querySelectorAll('.post-row').length + 1;
+      setGalZone('[data-upload="galbefore"]', ''); setGalZone('[data-upload="galafter"]', '');
+      openGalleryEditor();
+    });
+    function openGalleryForEdit(id, d) {
+      currentGalleryId = id;
+      galBeforeUrl = d.beforeUrl || ''; galAfterUrl = d.afterUrl || '';
+      galTitle.value = d.title || ''; galService.value = d.service || '';
+      galActive.checked = d.active !== false; galOrder.value = (d.order != null ? d.order : '');
+      setGalZone('[data-upload="galbefore"]', galBeforeUrl); setGalZone('[data-upload="galafter"]', galAfterUrl);
+      openGalleryEditor();
+    }
+    galCancelBtn.addEventListener('click', () => { galleryEditor.style.display = 'none'; });
+    galSaveBtn.addEventListener('click', async () => {
+      const title = galTitle.value.trim();
+      if (!title) { showToast('Add a project title.', true); return; }
+      if (!galBeforeUrl || !galAfterUrl) { showToast('Upload both a before and an after photo.', true); return; }
+      const data = {
+        title,
+        service: galService.value.trim() || null,
+        beforeUrl: galBeforeUrl,
+        afterUrl: galAfterUrl,
+        active: galActive.checked,
+        order: galOrder.value !== '' ? parseInt(galOrder.value, 10) : Date.now(),
+        updatedAt: serverTimestamp(),
+      };
+      galSaveBtn.disabled = true; galSaveBtn.textContent = 'Saving…';
+      try {
+        const id = currentGalleryId || ('gal_' + Date.now());
+        if (!currentGalleryId) data.createdAt = serverTimestamp();
+        await setDoc(doc(db, 'gallery', id), data, { merge: true });
+        showToast('Project saved');
+        galleryEditor.style.display = 'none';
+        loadGallery();
+      } catch (err) {
+        showToast('Couldn\'t save that project. Try again.', true);
+      } finally {
+        galSaveBtn.disabled = false; galSaveBtn.textContent = 'Save project';
+      }
+    });
+    function confirmDeleteGallery(id, title) {
+      confirmMessage.textContent = 'Delete "' + (title || 'this project') + '"? This can\'t be undone.';
+      confirmOverlay.classList.add('show');
+      confirmOk.onclick = async () => {
+        confirmOverlay.classList.remove('show');
+        try { await deleteDoc(doc(db, 'gallery', id)); showToast('Project deleted'); loadGallery(); }
+        catch (err) { showToast('Couldn\'t delete that project. Try again.', true); }
       };
     }
 

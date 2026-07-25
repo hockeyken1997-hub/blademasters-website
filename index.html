@@ -4,12 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blade Masters — Lawn Care & Landscaping | Shelby Township, Troy, Utica & Sterling Heights, MI</title>
-  <meta name="description" content="Top-rated lawn mowing, snow removal, bush trimming, and leaf cleanup in Shelby Township, Troy, Utica, Sterling Heights, and Warren, MI. Local, reliable, and affordable. Get a free quote today!" />
-  <meta name="keywords" content="lawn care Shelby Township MI, lawn mowing Troy MI, landscaping Utica MI, lawn service Sterling Heights MI, grass cutting Warren MI, snow removal Macomb County, bush trimming Shelby Township, leaf cleanup Troy MI, lawn care near me, grounds maintenance Macomb County, lawn mowing service Clinton Township, lawn care Macomb MI, affordable lawn care Michigan" />
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N0Z16CCZC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6N0Z16CCZC');
+  </script>
+  <meta name="description" content="Lawn mowing, snow removal, bush trimming, leaf cleanup, landscape installation, and planting for homes and businesses in Shelby Township, Troy, Utica, Sterling Heights, Warren, and Macomb County, MI. Residential and commercial. Family owned. Free quotes." />
+  <meta name="keywords" content="lawn care Shelby Township MI, lawn mowing Troy MI, landscaping Utica MI, lawn service Sterling Heights MI, grass cutting Warren MI, snow removal Macomb County, bush trimming Shelby Township, leaf cleanup Troy MI, lawn care near me, grounds maintenance Macomb County, lawn mowing service Clinton Township, lawn care Macomb MI, affordable lawn care Michigan, commercial snow removal Macomb County, commercial lawn care Michigan, landscape installation Shelby Township, landscaping Macomb County, tree and shrub planting, flower planting Michigan, commercial landscaping Macomb County, commercial property maintenance Michigan" />
   <meta name="geo.region" content="US-MI" />
   <meta name="geo.placename" content="Shelby Township, Michigan" />
   <meta property="og:title" content="Blade Masters — Lawn Care & Landscaping | Shelby Township, Troy & Utica MI" />
-  <meta property="og:description" content="Professional lawn mowing, snow removal, and landscaping in Shelby Township, Troy, Utica, Sterling Heights and Warren MI. Local family business. Free quotes." />
+  <meta property="og:description" content="Lawn mowing, snow removal, landscaping, landscape installation, and planting in Shelby Township, Troy, Utica, Sterling Heights, Warren and Macomb County, MI. Residential and commercial. Family owned. Free quotes." />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -38,7 +46,7 @@
     ],
     "openingHours": "Mo-Sa 07:00-19:00",
     "priceRange": "$$",
-    "serviceType": ["Lawn Mowing", "Snow Removal", "Bush Trimming", "Leaf Cleanup", "Landscaping"],
+    "serviceType": ["Lawn Mowing", "Snow Removal", "Commercial Snow Removal", "Bush Trimming", "Leaf Cleanup", "Landscaping", "Landscape Installation", "Planting"],
     "url": "https://blademastersinc.com"
   }
   </script>
@@ -256,6 +264,14 @@
 
     /* ── TESTIMONIALS ── */
     .testimonials-section { background: var(--navy-dark); }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 44px; }
+    .gallery-card { background: var(--off-white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .ba-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .ba-pair figure { margin: 0; position: relative; }
+    .ba-pair img { width: 100%; height: 210px; object-fit: cover; display: block; background: #e8eef2; }
+    .ba-pair figcaption { position: absolute; bottom: 8px; left: 8px; background: rgba(12,63,94,0.88); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 9px; border-radius: 4px; }
+    .gallery-title { padding: 15px 18px; font-weight: 700; color: var(--navy); font-size: 14px; }
+    .gallery-service { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 800; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; }
     .testimonials-carousel { position: relative; max-width: 660px; margin: 44px auto 0; padding: 0 52px; }
     .tc-viewport { overflow: hidden; }
     .tc-track { display: flex; transition: transform 0.5s ease; }
@@ -715,6 +731,16 @@ color:#0c3f5e;
   </section>
 
   <!-- TESTIMONIALS -->
+  <!-- BEFORE & AFTER GALLERY (managed from admin; hidden until it has projects) -->
+  <section class="section gallery-section" id="gallery" style="display:none;">
+    <div class="section-inner">
+      <div class="section-label">Our Work</div>
+      <h2 class="section-title">Before &amp; After</h2>
+      <p class="section-sub">Real projects from around Macomb County. See the difference for yourself.</p>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+  </section>
+
   <section class="section testimonials-section" id="reviews">
     <div class="section-inner">
       <div class="section-label" style="color:rgba(166,208,102,0.8);">What Clients Say</div>
@@ -1006,6 +1032,8 @@ color:#0c3f5e;
           <li><a href="#services">Snow Removal</a></li>
           <li><a href="#services">Bush & Shrub Trimming</a></li>
           <li><a href="#services">Leaf Cleanup</a></li>
+          <li><a href="#services">Landscape Install</a></li>
+          <li><a href="#services">Tree, Shrub &amp; Flower Planting</a></li>
         </ul>
       </div>
       <div>
@@ -1130,6 +1158,34 @@ color:#0c3f5e;
     }
     initReviewsCarousel();
 
+    // Before/After gallery (managed from admin). Section stays hidden if empty.
+    (async function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      const section = document.getElementById('gallery');
+      if (!grid || !section) return;
+      const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
+      try {
+        const snap = await getDocs(query(collection(db, 'gallery'), where('active', '==', true)));
+        if (snap.empty) return;
+        const arr = [];
+        snap.forEach(d => arr.push(d.data()));
+        arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        grid.innerHTML = arr.map(g => {
+          if (!g.beforeUrl || !g.afterUrl) return '';
+          return '<div class="gallery-card reveal visible">'
+            + '<div class="ba-pair">'
+              + '<figure><img loading="lazy" src="' + esc(g.beforeUrl) + '" alt="Before"><figcaption>Before</figcaption></figure>'
+              + '<figure><img loading="lazy" src="' + esc(g.afterUrl) + '" alt="After"><figcaption>After</figcaption></figure>'
+            + '</div>'
+            + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
+            + '</div>';
+        }).join('');
+        if (grid.innerHTML.trim()) section.style.display = '';
+      } catch (e) {
+        /* permission denied / offline: section stays hidden */
+      }
+    })();
+
     // Checkbox style
     document.querySelectorAll('.service-check input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', () => cb.closest('.service-check').classList.toggle('checked', cb.checked));
@@ -1210,6 +1266,7 @@ color:#0c3f5e;
           submittedAtLocal: new Date().toLocaleString(),
           source: 'website',
         });
+        if (typeof gtag === 'function') { gtag('event', 'generate_lead', { event_category: 'form', event_label: 'quote_request' }); }
         // Replace entire page with full thank you screen
         document.documentElement.style.scrollBehavior = 'auto';
         document.body.innerHTML = `
