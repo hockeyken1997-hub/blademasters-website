@@ -1022,7 +1022,7 @@ color:#0c3f5e;
   <!-- Firebase + JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, addDoc, collection, serverTimestamp }
+    import { getFirestore, addDoc, collection, serverTimestamp, getDocs, query, where }
       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -1036,6 +1036,33 @@ color:#0c3f5e;
 
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
+
+    // ── Reviews (managed from the admin page). Falls back to the built-in
+    //    cards below if Firestore has none or can't be reached, so the
+    //    section is never empty and stays search-engine friendly. ──
+    (async function renderReviews() {
+      const grid = document.querySelector('.testimonials-grid');
+      if (!grid) return;
+      const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
+      try {
+        const snap = await getDocs(query(collection(db, 'reviews'), where('active', '==', true)));
+        if (snap.empty) return; // keep the hardcoded fallback cards
+        const arr = [];
+        snap.forEach(d => arr.push(d.data()));
+        arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        grid.innerHTML = arr.map(r => {
+          const n = Math.max(1, Math.min(5, parseInt(r.rating, 10) || 5));
+          return '<div class="testimonial-card reveal visible">'
+            + '<div class="stars">' + '\u2605'.repeat(n) + '</div>'
+            + '<p class="testimonial-text">"' + esc(r.text) + '"</p>'
+            + '<div class="testimonial-author">' + esc(r.name) + '</div>'
+            + (r.location ? '<div class="testimonial-loc">' + esc(r.location) + '</div>' : '')
+            + '</div>';
+        }).join('');
+      } catch (e) {
+        /* permission denied / offline: keep the built-in fallback cards */
+      }
+    })();
 
     // Checkbox style
     document.querySelectorAll('.service-check input[type="checkbox"]').forEach(cb => {

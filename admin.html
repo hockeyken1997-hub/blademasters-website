@@ -229,6 +229,11 @@
     .confirm-card { background: var(--white); border-radius: 14px; padding: 24px; max-width: 360px; text-align: center; }
     .confirm-card p { font-size: 14px; color: var(--text); margin-bottom: 18px; }
     .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .review-editor { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px; background: #fff; }
+    .rev-stars { color: #e0a63a; letter-spacing: 2px; font-size: 14px; margin-bottom: 3px; }
+    .post-row.rev-inactive { opacity: 0.55; }
+    .rev-active-label { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+    .rev-active-label input { width: auto; margin: 0; }
   </style>
 </head>
 <body>
@@ -263,6 +268,7 @@
       <div class="tabs">
         <button class="tab-btn active" id="tab-list-btn">All posts</button>
         <button class="tab-btn" id="tab-editor-btn" style="display:none;">Editor</button>
+        <button class="tab-btn" id="tab-reviews-btn">Reviews</button>
       </div>
 
       <!-- POST LIST VIEW -->
@@ -322,6 +328,55 @@
             <button class="btn-secondary" id="back-to-list-btn">Back to all posts</button>
             <button class="btn-secondary" id="save-draft-btn">Save draft</button>
             <button class="btn-primary" id="publish-btn">Publish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEWS VIEW -->
+      <div id="view-reviews" style="display:none;">
+        <div class="list-toolbar">
+          <span class="list-count" id="review-count">Loading…</span>
+          <button class="new-post-btn" id="new-review-btn">+ New review</button>
+        </div>
+        <div class="post-list" id="review-list"></div>
+
+        <div id="review-editor" class="review-editor" style="display:none;">
+          <div class="editor-field">
+            <label>Customer name</label>
+            <input type="text" id="rev-name" placeholder="Mike T." />
+          </div>
+          <div class="editor-field">
+            <label>Location</label>
+            <input type="text" id="rev-loc" placeholder="Sterling Heights, MI" />
+          </div>
+          <div class="editor-row-2">
+            <div class="editor-field">
+              <label>Rating</label>
+              <select id="rev-rating">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★ (4)</option>
+                <option value="3">★★★ (3)</option>
+                <option value="2">★★ (2)</option>
+                <option value="1">★ (1)</option>
+              </select>
+            </div>
+            <div class="editor-field">
+              <label>Display order</label>
+              <input type="number" id="rev-order" placeholder="1" />
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>Review text</label>
+            <textarea id="rev-text" rows="4" placeholder="What the customer said about your work…"></textarea>
+          </div>
+          <div class="editor-field">
+            <label class="rev-active-label"><input type="checkbox" id="rev-active" checked /> Show on website</label>
+          </div>
+          <div class="editor-footer">
+            <div class="editor-footer-actions">
+              <button class="btn-secondary" id="rev-cancel-btn">Cancel</button>
+              <button class="btn-primary" id="rev-save-btn">Save review</button>
+            </div>
           </div>
         </div>
       </div>
@@ -403,8 +458,25 @@
     const confirmCancel = document.getElementById('confirm-cancel');
     const confirmOk = document.getElementById('confirm-ok');
 
+    // Reviews refs
+    const tabReviewsBtn = document.getElementById('tab-reviews-btn');
+    const viewReviews = document.getElementById('view-reviews');
+    const reviewListEl = document.getElementById('review-list');
+    const reviewCountEl = document.getElementById('review-count');
+    const newReviewBtn = document.getElementById('new-review-btn');
+    const reviewEditor = document.getElementById('review-editor');
+    const revName = document.getElementById('rev-name');
+    const revLoc = document.getElementById('rev-loc');
+    const revRating = document.getElementById('rev-rating');
+    const revOrder = document.getElementById('rev-order');
+    const revText = document.getElementById('rev-text');
+    const revActive = document.getElementById('rev-active');
+    const revSaveBtn = document.getElementById('rev-save-btn');
+    const revCancelBtn = document.getElementById('rev-cancel-btn');
+
     // ── State ──
     let currentPostId = null;
+    let currentReviewId = null;
     let currentStatus = 'draft';
     let blocks = [];
     let blockIdCounter = 0;
@@ -479,20 +551,36 @@
     function showListView() {
       viewList.style.display = 'block';
       viewEditor.style.display = 'none';
+      viewReviews.style.display = 'none';
       tabListBtn.classList.add('active');
       tabEditorBtn.classList.remove('active');
       tabEditorBtn.style.display = 'none';
+      tabReviewsBtn.classList.remove('active');
       loadPostList();
     }
     function showEditorView() {
       viewList.style.display = 'none';
       viewEditor.style.display = 'block';
+      viewReviews.style.display = 'none';
       tabListBtn.classList.remove('active');
       tabEditorBtn.classList.add('active');
       tabEditorBtn.style.display = 'inline-block';
+      tabReviewsBtn.classList.remove('active');
+    }
+    function showReviewsView() {
+      viewList.style.display = 'none';
+      viewEditor.style.display = 'none';
+      viewReviews.style.display = 'block';
+      reviewEditor.style.display = 'none';
+      tabListBtn.classList.remove('active');
+      tabEditorBtn.classList.remove('active');
+      tabEditorBtn.style.display = 'none';
+      tabReviewsBtn.classList.add('active');
+      loadReviews();
     }
     tabListBtn.addEventListener('click', showListView);
     tabEditorBtn.addEventListener('click', showEditorView);
+    tabReviewsBtn.addEventListener('click', showReviewsView);
     backToListBtn.addEventListener('click', showListView);
 
     // ── Post list ──
@@ -554,6 +642,115 @@
       };
     }
     confirmCancel.addEventListener('click', () => confirmOverlay.classList.remove('show'));
+
+    // ── Reviews ──
+    async function loadReviews() {
+      reviewListEl.innerHTML = '';
+      reviewCountEl.textContent = 'Loading…';
+      try {
+        const snap = await getDocs(query(collection(db, 'reviews'), orderBy('order', 'asc')));
+        if (snap.empty) {
+          reviewListEl.innerHTML = '<div class="empty-state">No reviews yet. Click "New review" to add your first one.</div>';
+          reviewCountEl.textContent = '0 reviews';
+          return;
+        }
+        reviewCountEl.textContent = snap.size + (snap.size === 1 ? ' review' : ' reviews');
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const row = document.createElement('div');
+          row.className = 'post-row' + (d.active === false ? ' rev-inactive' : '');
+          const n = Math.max(1, Math.min(5, parseInt(d.rating, 10) || 5));
+          const preview = (d.text || '').slice(0, 90) + ((d.text || '').length > 90 ? '…' : '');
+          row.innerHTML =
+            '<div class="post-row-info">' +
+              '<div class="rev-stars">' + '\u2605'.repeat(n) + '</div>' +
+              '<div class="post-row-title">' + escapeHtml(d.name || '—') + (d.location ? ' · <span style="font-weight:500;opacity:.7">' + escapeHtml(d.location) + '</span>' : '') + '</div>' +
+              '<div class="post-row-meta">' + escapeHtml(preview) + '</div>' +
+            '</div>' +
+            '<span class="post-badge ' + (d.active === false ? 'draft' : 'live') + '">' + (d.active === false ? 'Hidden' : 'Shown') + '</span>' +
+            '<span class="post-row-delete" data-id="' + docSnap.id + '">✕</span>';
+          row.addEventListener('click', e => {
+            if (e.target.classList.contains('post-row-delete')) return;
+            openReviewForEdit(docSnap.id, d);
+          });
+          row.querySelector('.post-row-delete').addEventListener('click', e => {
+            e.stopPropagation();
+            confirmDeleteReview(docSnap.id, d.name);
+          });
+          reviewListEl.appendChild(row);
+        });
+      } catch (err) {
+        reviewListEl.innerHTML = '<div class="empty-state">Couldn\'t load reviews. Refresh the page to try again.</div>';
+        reviewCountEl.textContent = '';
+      }
+    }
+
+    function openReviewEditor() {
+      reviewEditor.style.display = 'block';
+      reviewEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    newReviewBtn.addEventListener('click', () => {
+      currentReviewId = null;
+      revName.value = ''; revLoc.value = ''; revRating.value = '5';
+      revText.value = ''; revActive.checked = true;
+      revOrder.value = reviewListEl.querySelectorAll('.post-row').length + 1;
+      openReviewEditor();
+    });
+    function openReviewForEdit(id, d) {
+      currentReviewId = id;
+      revName.value = d.name || '';
+      revLoc.value = d.location || '';
+      revRating.value = String(d.rating || 5);
+      revText.value = d.text || '';
+      revActive.checked = d.active !== false;
+      revOrder.value = (d.order != null ? d.order : '');
+      openReviewEditor();
+    }
+    revCancelBtn.addEventListener('click', () => { reviewEditor.style.display = 'none'; });
+
+    revSaveBtn.addEventListener('click', async () => {
+      const name = revName.value.trim();
+      const text = revText.value.trim();
+      if (!name) { showToast('Add a customer name.', true); return; }
+      if (!text) { showToast('Add the review text.', true); return; }
+      const data = {
+        name,
+        location: revLoc.value.trim() || null,
+        rating: parseInt(revRating.value, 10) || 5,
+        text,
+        active: revActive.checked,
+        order: revOrder.value !== '' ? parseInt(revOrder.value, 10) : Date.now(),
+        updatedAt: serverTimestamp(),
+      };
+      revSaveBtn.disabled = true; revSaveBtn.textContent = 'Saving…';
+      try {
+        const id = currentReviewId || ('rev_' + Date.now());
+        if (!currentReviewId) data.createdAt = serverTimestamp();
+        await setDoc(doc(db, 'reviews', id), data, { merge: true });
+        showToast('Review saved');
+        reviewEditor.style.display = 'none';
+        loadReviews();
+      } catch (err) {
+        showToast('Couldn\'t save that review. Try again.', true);
+      } finally {
+        revSaveBtn.disabled = false; revSaveBtn.textContent = 'Save review';
+      }
+    });
+
+    function confirmDeleteReview(id, name) {
+      confirmMessage.textContent = 'Delete the review from "' + (name || 'this customer') + '"? This can\'t be undone.';
+      confirmOverlay.classList.add('show');
+      confirmOk.onclick = async () => {
+        confirmOverlay.classList.remove('show');
+        try {
+          await deleteDoc(doc(db, 'reviews', id));
+          showToast('Review deleted');
+          loadReviews();
+        } catch (err) {
+          showToast('Couldn\'t delete that review. Try again.', true);
+        }
+      };
+    }
 
     function escapeHtml(str) {
       const div = document.createElement('div');
