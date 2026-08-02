@@ -91,6 +91,25 @@
     .nav-phone:hover { color: var(--accent); }
     .nav-phone-icon { font-size: 14px; }
     @media(min-width:640px) { .nav-phone { display: flex; } }
+
+    /* ── Facebook link (header + mobile banner) ──────────────────────── */
+    .nav-social {
+      display: none;
+      align-items: center; gap: 7px;
+      color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: color 0.15s;
+    }
+    .nav-social:hover, .nav-social:focus-visible { color: var(--accent); }
+    .nav-social svg { flex-shrink: 0; }
+    /* Matches .nav-phone's breakpoint so the two appear and disappear together. */
+    @media(min-width:640px) { .nav-social { display: flex; } }
+    .banner-social {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 700;
+      text-decoration: none;
+    }
+    .banner-social:hover, .banner-social:focus-visible { color: var(--accent); }
+
     .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav-cta {
       background: var(--accent); color: var(--navy-dark);
@@ -299,6 +318,42 @@
     @media (prefers-reduced-motion: reduce) {
       .blog-card, .blog-card-more svg { transition: none; }
       .blog-card:hover, .blog-card:focus-visible { transform: none; }
+    }
+
+
+    /* ── Gallery: single photos + lightbox ─────────────────────────── */
+    .gallery-card.is-single { cursor: zoom-in; }
+    .gallery-single-img { width: 100%; height: 240px; object-fit: cover; display: block; background: #e8eef2; }
+    .gallery-caption { padding: 0 18px 15px; font-size: 13px; color: var(--muted); line-height: 1.55; margin-top: -4px; }
+    .ba-pair figure { cursor: zoom-in; }
+
+    .lb-overlay {
+      position: fixed; inset: 0; z-index: 9000; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(8,26,38,0.92); padding: 20px;
+    }
+    .lb-overlay.is-open { display: flex; }
+    .lb-figure { margin: 0; max-width: 1100px; width: 100%; text-align: center; }
+    .lb-img {
+      max-width: 100%; max-height: 78vh; object-fit: contain;
+      border-radius: 10px; display: block; margin: 0 auto;
+    }
+    .lb-cap { color: #e8f0f4; font-size: 14px; line-height: 1.6; margin-top: 14px; }
+    .lb-count { color: rgba(232,240,244,0.6); font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-top: 6px; }
+    .lb-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .lb-btn:hover, .lb-btn:focus-visible { background: rgba(255,255,255,0.24); }
+    .lb-prev { left: 16px; } .lb-next { right: 16px; }
+    .lb-close { position: absolute; top: 16px; right: 16px; transform: none; }
+    @media (max-width: 640px) {
+      .lb-btn { width: 44px; height: 44px; }
+      .lb-prev { left: 6px; } .lb-next { right: 6px; }
+      .gallery-single-img { height: 200px; }
     }
 
     .testimonials-carousel { position: relative; max-width: 660px; margin: 44px auto 0; padding: 0 52px; }
@@ -608,6 +663,9 @@ color:#0c3f5e;
       <a href="tel:+15864950348" class="nav-phone">
         <span class="nav-phone-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span> (586) 495-0348
       </a>
+      <a href="https://www.facebook.com/blademastersyard" class="nav-social" target="_blank" rel="noopener noreferrer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94z"/></svg> Like us on Facebook
+      </a>
     </div>
     <div class="nav-right">
       <a href="#request" class="nav-cta">Get a Free Quote</a>
@@ -628,6 +686,9 @@ color:#0c3f5e;
   <div class="phone-banner" style="margin-top:68px;">
     <span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call or text us:</span>
     <a href="tel:+15864950348">(586) 495-0348</a>
+    <a href="https://www.facebook.com/blademastersyard" class="banner-social" target="_blank" rel="noopener noreferrer">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94z"/></svg> Like us on Facebook
+    </a>
   </div>
 
   <!-- HERO -->
@@ -1025,6 +1086,24 @@ color:#0c3f5e;
 
 
   <!-- GAME -->
+  <!-- Gallery lightbox. Built once and reused; populated by the gallery loader. -->
+  <div class="lb-overlay" id="lbOverlay" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-btn lb-close" id="lbClose" aria-label="Close photo viewer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <figure class="lb-figure">
+      <img class="lb-img" id="lbImg" src="" alt="">
+      <figcaption class="lb-cap" id="lbCap"></figcaption>
+      <div class="lb-count" id="lbCount"></div>
+    </figure>
+  </div>
+
   <section class="section game-section" id="game">
     <div class="section-inner">
       <div class="game-teaser">
@@ -1200,34 +1279,135 @@ color:#0c3f5e;
     }
     initReviewsCarousel();
 
-    // Before/After gallery (managed from admin). Section stays hidden if empty.
+    // Gallery (managed from admin). Holds two kinds of entry:
+    //   kind === 'single' -> one photo + optional caption
+    //   kind === 'pair'   -> before/after pair
+    // Entries created before `kind` existed have none, so they're inferred from
+    // which URLs they carry. Singles render first, then pairs.
+    // Every photo is clickable and opens a shared lightbox.
     (async function renderGallery() {
       const grid = document.getElementById('galleryGrid');
       const section = document.getElementById('gallery');
       if (!grid || !section) return;
       const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
+
+      // Flat list of every image on show, in DOM order, so the lightbox can page
+      // through the whole gallery rather than one card at a time.
+      const shots = [];
+
       try {
         const snap = await getDocs(query(collection(db, 'gallery'), where('active', '==', true)));
         if (snap.empty) return;
         const arr = [];
         snap.forEach(d => arr.push(d.data()));
-        arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const kindOf = g => g.kind || (g.imageUrl && !g.beforeUrl ? 'single' : 'pair');
+        arr.sort((a, b) => {
+          const ka = kindOf(a) === 'single' ? 0 : 1;
+          const kb = kindOf(b) === 'single' ? 0 : 1;
+          if (ka !== kb) return ka - kb;
+          return (a.order ?? 0) - (b.order ?? 0);
+        });
+
         grid.innerHTML = arr.map(g => {
+          const kind = kindOf(g);
+
+          if (kind === 'single') {
+            if (!g.imageUrl) return '';
+            const i = shots.length;
+            shots.push({ src: g.imageUrl, cap: [g.title, g.caption].filter(Boolean).join(' \u2014 ') });
+            return '<div class="gallery-card is-single reveal visible">'
+              + '<img class="gallery-single-img" loading="lazy" src="' + esc(g.imageUrl) + '" alt="' + esc(g.title || 'Blade Masters project photo') + '" data-shot="' + i + '">'
+              + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
+              + (g.caption ? '<div class="gallery-caption">' + esc(g.caption) + '</div>' : '')
+              + '</div>';
+          }
+
           if (!g.beforeUrl || !g.afterUrl) return '';
+          const ib = shots.length;
+          shots.push({ src: g.beforeUrl, cap: (g.title ? g.title + ' \u2014 ' : '') + 'Before' });
+          const ia = shots.length;
+          shots.push({ src: g.afterUrl, cap: (g.title ? g.title + ' \u2014 ' : '') + 'After' });
           return '<div class="gallery-card reveal visible">'
             + '<div class="ba-pair">'
-              + '<figure><img loading="lazy" src="' + esc(g.beforeUrl) + '" alt="Before"><figcaption>Before</figcaption></figure>'
-              + '<figure><img loading="lazy" src="' + esc(g.afterUrl) + '" alt="After"><figcaption>After</figcaption></figure>'
+              + '<figure><img loading="lazy" src="' + esc(g.beforeUrl) + '" alt="Before" data-shot="' + ib + '"><figcaption>Before</figcaption></figure>'
+              + '<figure><img loading="lazy" src="' + esc(g.afterUrl) + '" alt="After" data-shot="' + ia + '"><figcaption>After</figcaption></figure>'
             + '</div>'
             + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
             + '</div>';
         }).join('');
-        if (grid.innerHTML.trim()) section.style.display = '';
+
+        if (!grid.innerHTML.trim()) return;
+        section.style.display = '';
+
+        // ── Lightbox ──
+        const ov = document.getElementById('lbOverlay');
+        const img = document.getElementById('lbImg');
+        const cap = document.getElementById('lbCap');
+        const cnt = document.getElementById('lbCount');
+        if (!ov || !img) return;
+
+        let idx = 0;
+        let lastFocus = null;
+
+        const show = i => {
+          idx = (i + shots.length) % shots.length;
+          const shot = shots[idx];
+          img.src = shot.src;
+          img.alt = shot.cap || '';
+          cap.textContent = shot.cap || '';
+          cnt.textContent = shots.length > 1 ? (idx + 1) + ' / ' + shots.length : '';
+        };
+        const open = i => {
+          lastFocus = document.activeElement;
+          show(i);
+          ov.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+          document.getElementById('lbClose').focus();
+        };
+        const close = () => {
+          ov.classList.remove('is-open');
+          document.body.style.overflow = '';
+          img.src = '';
+          if (lastFocus && lastFocus.focus) lastFocus.focus();
+        };
+
+        grid.addEventListener('click', e => {
+          const t = e.target.closest('[data-shot]');
+          if (!t) return;
+          open(parseInt(t.dataset.shot, 10) || 0);
+        });
+
+        document.getElementById('lbClose').addEventListener('click', close);
+        document.getElementById('lbPrev').addEventListener('click', e => { e.stopPropagation(); show(idx - 1); });
+        document.getElementById('lbNext').addEventListener('click', e => { e.stopPropagation(); show(idx + 1); });
+        ov.addEventListener('click', e => { if (e.target === ov || e.target.classList.contains('lb-figure')) close(); });
+
+        document.addEventListener('keydown', e => {
+          if (!ov.classList.contains('is-open')) return;
+          if (e.key === 'Escape') close();
+          else if (e.key === 'ArrowLeft') show(idx - 1);
+          else if (e.key === 'ArrowRight') show(idx + 1);
+        });
+
+        // Swipe on touch devices.
+        let x0 = null;
+        ov.addEventListener('touchstart', e => { x0 = e.changedTouches[0].clientX; }, { passive: true });
+        ov.addEventListener('touchend', e => {
+          if (x0 === null) return;
+          const dx = e.changedTouches[0].clientX - x0;
+          if (Math.abs(dx) > 45) show(idx + (dx < 0 ? 1 : -1));
+          x0 = null;
+        }, { passive: true });
+
+        if (shots.length < 2) {
+          document.getElementById('lbPrev').style.display = 'none';
+          document.getElementById('lbNext').style.display = 'none';
+        }
       } catch (e) {
         /* permission denied / offline: section stays hidden */
       }
     })();
-
 
     // Latest blog posts. Mirrors the gallery loader: the section stays hidden
     // unless posts actually render, so a slow network, a permissions error, or an

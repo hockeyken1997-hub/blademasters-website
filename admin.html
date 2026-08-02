@@ -171,6 +171,17 @@
     .upload-text { font-size: 13px; color: var(--muted); }
     .upload-progress { font-size: 12px; color: var(--navy); margin-top: 8px; }
 
+
+    .gal-kind-toggle { display: flex; gap: 8px; }
+    .gal-kind-btn {
+      flex: 1; padding: 10px 12px; border-radius: 8px; cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      background: #fff; color: var(--muted); border: 1.5px solid var(--border);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .gal-kind-btn:hover { border-color: var(--navy); color: var(--navy); }
+    .gal-kind-btn.is-on { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .gal-single-wrap .ba-upload-zone { width: 100%; }
     .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     @media(max-width: 500px) { .ba-grid { grid-template-columns: 1fr; } }
     .ba-col-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
@@ -393,6 +404,13 @@
 
         <div id="gallery-editor" class="review-editor" style="display:none;">
           <div class="editor-field">
+            <label>Entry type</label>
+            <div class="gal-kind-toggle">
+              <button type="button" class="gal-kind-btn is-on" data-kind="single">Single photo</button>
+              <button type="button" class="gal-kind-btn" data-kind="pair">Before &amp; after</button>
+            </div>
+          </div>
+          <div class="editor-field">
             <label>Project title</label>
             <input type="text" id="gal-title" placeholder="Full backyard makeover — Shelby Township" />
           </div>
@@ -400,7 +418,16 @@
             <label>Service (optional)</label>
             <input type="text" id="gal-service" placeholder="Landscape Install" />
           </div>
-          <div class="ba-grid">
+          <div class="gal-single-wrap" id="gal-single-wrap">
+            <div class="ba-col-label">Photo</div>
+            <div class="ba-upload-zone" data-upload="galsingle"><div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div></div>
+            <input type="file" accept="image/*" style="display:none;" data-fileinput="galsingle" />
+            <div class="editor-field" style="margin-top:14px;">
+              <label>Caption (optional)</label>
+              <input type="text" id="gal-caption" placeholder="Fresh stripes on a Troy corner lot" />
+            </div>
+          </div>
+          <div class="ba-grid" id="gal-pair-wrap" style="display:none;">
             <div>
               <div class="ba-col-label">Before</div>
               <div class="ba-upload-zone" data-upload="galbefore"><div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div></div>
@@ -531,6 +558,25 @@
     const galService = document.getElementById('gal-service');
     const galOrder = document.getElementById('gal-order');
     const galActive = document.getElementById('gal-active');
+    const galCaption = document.getElementById('gal-caption');
+    const galSingleWrap = document.getElementById('gal-single-wrap');
+    const galPairWrap = document.getElementById('gal-pair-wrap');
+    // 'single' = one photo + caption, 'pair' = before/after. Stored on the doc as
+    // `kind`; entries saved before this existed have no kind and are read as pairs.
+    let galKind = 'single';
+    let galSingleUrl = '';
+
+    function setGalKind(kind) {
+      galKind = kind === 'pair' ? 'pair' : 'single';
+      document.querySelectorAll('.gal-kind-btn').forEach(b => {
+        b.classList.toggle('is-on', b.dataset.kind === galKind);
+      });
+      if (galSingleWrap) galSingleWrap.style.display = galKind === 'single' ? 'block' : 'none';
+      if (galPairWrap) galPairWrap.style.display = galKind === 'pair' ? 'grid' : 'none';
+    }
+    document.querySelectorAll('.gal-kind-btn').forEach(btn => {
+      btn.addEventListener('click', () => setGalKind(btn.dataset.kind));
+    });
     const galSaveBtn = document.getElementById('gal-save-btn');
     const galCancelBtn = document.getElementById('gal-cancel-btn');
     let currentGalleryId = null;
@@ -842,6 +888,7 @@
       if (url) { zone.classList.add('has-image'); zone.innerHTML = '<img src="' + url + '" alt="" />'; }
       else { zone.classList.remove('has-image'); zone.innerHTML = '<div><div class="upload-icon">📷</div><div class="upload-text">Upload</div></div>'; }
     }
+    wireUpload(galleryEditor, '[data-upload="galsingle"]', '[data-fileinput="galsingle"]', url => { galSingleUrl = url; setGalZone('[data-upload="galsingle"]', url); });
     wireUpload(galleryEditor, '[data-upload="galbefore"]', '[data-fileinput="galbefore"]', url => { galBeforeUrl = url; setGalZone('[data-upload="galbefore"]', url); });
     wireUpload(galleryEditor, '[data-upload="galafter"]', '[data-fileinput="galafter"]', url => { galAfterUrl = url; setGalZone('[data-upload="galafter"]', url); });
 
@@ -880,30 +927,45 @@
     function openGalleryEditor() { galleryEditor.style.display = 'block'; galleryEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     newGalleryBtn.addEventListener('click', () => {
       currentGalleryId = null;
-      galBeforeUrl = ''; galAfterUrl = '';
+      galBeforeUrl = ''; galAfterUrl = ''; galSingleUrl = '';
       galTitle.value = ''; galService.value = ''; galActive.checked = true;
+      if (galCaption) galCaption.value = '';
       galOrder.value = galleryListEl.querySelectorAll('.post-row').length + 1;
       setGalZone('[data-upload="galbefore"]', ''); setGalZone('[data-upload="galafter"]', '');
+      setGalZone('[data-upload="galsingle"]', '');
+      setGalKind('single');
       openGalleryEditor();
     });
     function openGalleryForEdit(id, d) {
       currentGalleryId = id;
       galBeforeUrl = d.beforeUrl || ''; galAfterUrl = d.afterUrl || '';
+      galSingleUrl = d.imageUrl || '';
       galTitle.value = d.title || ''; galService.value = d.service || '';
+      if (galCaption) galCaption.value = d.caption || '';
       galActive.checked = d.active !== false; galOrder.value = (d.order != null ? d.order : '');
       setGalZone('[data-upload="galbefore"]', galBeforeUrl); setGalZone('[data-upload="galafter"]', galAfterUrl);
+      setGalZone('[data-upload="galsingle"]', galSingleUrl);
+      // Older entries predate `kind` — infer from which URLs they carry.
+      setGalKind(d.kind || (d.imageUrl && !d.beforeUrl ? 'single' : 'pair'));
       openGalleryEditor();
     }
     galCancelBtn.addEventListener('click', () => { galleryEditor.style.display = 'none'; });
     galSaveBtn.addEventListener('click', async () => {
       const title = galTitle.value.trim();
       if (!title) { showToast('Add a project title.', true); return; }
-      if (!galBeforeUrl || !galAfterUrl) { showToast('Upload both a before and an after photo.', true); return; }
+      if (galKind === 'single' && !galSingleUrl) { showToast('Upload a photo first.', true); return; }
+      if (galKind === 'pair' && (!galBeforeUrl || !galAfterUrl)) { showToast('Upload both a before and an after photo.', true); return; }
+      // Both URL sets are written every time, with the unused side cleared. That
+      // way switching an existing entry from pair to single (or back) can't leave
+      // stale URLs behind that the homepage would still try to render.
       const data = {
         title,
+        kind: galKind,
         service: galService.value.trim() || null,
-        beforeUrl: galBeforeUrl,
-        afterUrl: galAfterUrl,
+        caption: galKind === 'single' ? (galCaption && galCaption.value.trim()) || null : null,
+        imageUrl: galKind === 'single' ? galSingleUrl : null,
+        beforeUrl: galKind === 'pair' ? galBeforeUrl : null,
+        afterUrl: galKind === 'pair' ? galAfterUrl : null,
         active: galActive.checked,
         order: galOrder.value !== '' ? parseInt(galOrder.value, 10) : Date.now(),
         updatedAt: serverTimestamp(),
