@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blade Masters — Lawn Care & Landscaping | Shelby Township, Troy, Utica & Sterling Heights, MI</title>
+  <title>Blade Masters — Lawn Care & Snow Removal | Shelby Township, Troy, Utica & Sterling Heights, MI</title>
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N0Z16CCZC"></script>
   <script>
@@ -16,8 +16,35 @@
   <meta name="keywords" content="lawn care Shelby Township MI, lawn mowing Troy MI, landscaping Utica MI, lawn service Sterling Heights MI, grass cutting Warren MI, snow removal Macomb County, bush trimming Shelby Township, leaf cleanup Troy MI, lawn care near me, grounds maintenance Macomb County, lawn mowing service Clinton Township, lawn care Macomb MI, affordable lawn care Michigan, commercial snow removal Macomb County, commercial lawn care Michigan, landscape installation Shelby Township, landscaping Macomb County, tree and shrub planting, flower planting Michigan, commercial landscaping Macomb County, commercial property maintenance Michigan" />
   <meta name="geo.region" content="US-MI" />
   <meta name="geo.placename" content="Shelby Township, Michigan" />
-  <meta property="og:title" content="Blade Masters — Lawn Care & Landscaping | Shelby Township, Troy & Utica MI" />
+  <meta property="og:title" content="Blade Masters — Lawn Care & Snow Removal | Shelby Township, Troy & Utica MI" />
   <meta property="og:description" content="Lawn mowing, snow removal, landscaping, landscape installation, and planting in Shelby Township, Troy, Utica, Sterling Heights, Warren and Macomb County, MI. Residential and commercial. Family owned. Free quotes." />
+  <!-- Link preview image. The logo is nearly square but previews render at 1200x630,
+       so Cloudinary pads it onto a canvas in the brand navy (#11557c) rather than
+       leaving white bars. Transformation happens on Cloudinary's side — the stored
+       file is untouched, so swapping in a photo later is just a URL change. -->
+  <meta property="og:image" content="https://res.cloudinary.com/vzvbevi1/image/upload/c_pad,w_1200,h_630,b_rgb:11557c/v1785691169/gmradjlpshhh83bujrfh.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Blade Masters Yard Maintenance" />
+  <meta property="og:site_name" content="Blade Masters" />
+  <meta property="og:url" content="https://blademasterwebsite.netlify.app/" />
+  <!-- X/Twitter ignores og:image sizing unless told the card is a large one. -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blade Masters — Lawn Care &amp; Snow Removal | Shelby Township, Troy &amp; Utica MI" />
+  <meta name="twitter:description" content="Lawn mowing, snow removal, bush trimming, leaf cleanup and landscaping in Shelby Township, Troy, Utica, Sterling Heights, Warren and Macomb County, MI. Family owned. Free quotes." />
+  <meta name="twitter:image" content="https://res.cloudinary.com/vzvbevi1/image/upload/c_pad,w_1200,h_630,b_rgb:11557c/v1785691169/gmradjlpshhh83bujrfh.png" />
+  <meta property="og:image" content="https://res.cloudinary.com/vzvbevi1/image/upload/c_pad,w_1200,h_630,b_auto/v1785691169/gmradjlpshhh83bujrfh.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Blade Masters Yard Maintenance" />
+  <meta property="og:url" content="https://blademasterswebsite.netlify.app/" />
+  <meta property="og:site_name" content="Blade Masters" />
+  <!-- Twitter reads its own tags first and only falls back to og: for some fields,
+       so the card type and image are declared explicitly. -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blade Masters — Lawn Care &amp; Snow Removal | Shelby Township, Troy &amp; Utica MI" />
+  <meta name="twitter:description" content="Lawn mowing, snow removal, bush trimming, leaf cleanup, and landscape installation in Shelby Township, Troy, Utica, Sterling Heights, Warren and Macomb County, MI. Family owned. Free quotes." />
+  <meta name="twitter:image" content="https://res.cloudinary.com/vzvbevi1/image/upload/c_pad,w_1200,h_630,b_auto/v1785691169/gmradjlpshhh83bujrfh.png" />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1070,11 +1097,25 @@ color:#0c3f5e;
             <input type="text" id="otherService" placeholder="Tell us what else you need…" />
           </div>
           <div class="form-group">
-            <label>How often do you need service?</label>
+            <label>How often do you need lawn service?</label>
             <select id="frequency">
               <option value="">Select...</option>
               <option value="Weekly">Weekly (recommended)</option>
               <option value="One-time">One-time visit</option>
+              <option value="Not sure">Not sure yet, let's talk</option>
+            </select>
+          </div>
+          <!-- Snow runs on a different schedule than mowing, so it gets its own
+               question. Revealed only when Snow Removal is checked, matching the
+               pattern already used by the "Other" service field above. -->
+          <div class="form-group" id="snowFreqGroup" style="display:none;">
+            <label>How should we handle snow?</label>
+            <select id="snowFrequency">
+              <option value="">Select...</option>
+              <option value="Per snowfall">Every snowfall (2 inches or more)</option>
+              <option value="Seasonal">Seasonal contract</option>
+              <option value="On call">Call me each time</option>
+              <option value="One-time">One-time / as needed</option>
             </select>
           </div>
           <div class="form-section-head">Anything Else?</div>
@@ -1488,6 +1529,21 @@ color:#0c3f5e;
       cb.addEventListener('change', () => cb.closest('.service-check').classList.toggle('checked', cb.checked));
     });
 
+    // Snow Removal reveals its own scheduling question. Uses the checkbox's value
+    // rather than an id so it keeps working if the markup order changes.
+    (function wireSnowFrequency() {
+      const snowBox = document.querySelector('.service-check input[value="Snow Removal"]');
+      const group   = document.getElementById('snowFreqGroup');
+      if (!snowBox || !group) return;
+      const sync = () => {
+        group.style.display = snowBox.checked ? 'block' : 'none';
+        // Clear the value when hidden so an unchecked service can't submit a stale answer.
+        if (!snowBox.checked) document.getElementById('snowFrequency').value = '';
+      };
+      snowBox.addEventListener('change', sync);
+      sync();
+    })();
+
     // "Other" service reveals a free-text box
     const otherCheck = document.getElementById('otherServiceCheck');
     const otherGroup = document.getElementById('otherServiceGroup');
@@ -1533,6 +1589,7 @@ color:#0c3f5e;
       const city      = document.getElementById('city').value.trim();
       const zip       = document.getElementById('zip').value.trim();
       const frequency = document.getElementById('frequency').value;
+      const snowFrequency = document.getElementById('snowFrequency').value;
       const notes     = document.getElementById('notes').value.trim();
       const propertyType = (document.querySelector('.prop-type-checks input[type="radio"]:checked') || {}).value || '';
       const services  = [...document.querySelectorAll('.services-checks:not(.prop-type-checks) input[type="checkbox"]:checked')].map(c => c.value);
@@ -1557,7 +1614,8 @@ color:#0c3f5e;
           address: [street, city, 'MI', zip].filter(Boolean).join(', '),
           street, city, zip: zip || null, state: 'MI',
           propertyType,
-          services: servicesFinal, otherService: otherService || null, frequency: frequency || null, notes: notes || null,
+          services: servicesFinal, otherService: otherService || null, frequency: frequency || null,
+          snowFrequency: snowFrequency || null, notes: notes || null,
           status: 'new',
           submittedAt: serverTimestamp(),
           submittedAtLocal: new Date().toLocaleString(),
