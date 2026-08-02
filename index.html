@@ -283,11 +283,15 @@
 
     /* ── TESTIMONIALS ── */
     .testimonials-section { background: var(--navy-dark); }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 44px; }
+    .gallery-grid {
+      display: grid; gap: 24px; margin-top: 44px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
+      justify-content: center;
+    }
     .gallery-card { background: var(--off-white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     .ba-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
     .ba-pair figure { margin: 0; position: relative; }
-    .ba-pair img { width: 100%; height: 210px; object-fit: cover; display: block; background: #e8eef2; }
+    .ba-pair img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: center; display: block; background: #e8eef2; }
     .ba-pair figcaption { position: absolute; bottom: 8px; left: 8px; background: rgba(12,63,94,0.88); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 9px; border-radius: 4px; }
     .gallery-title { padding: 15px 18px; font-weight: 700; color: var(--navy); font-size: 14px; }
     .gallery-service { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 800; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -323,7 +327,7 @@
 
     /* ── Gallery: single photos + lightbox ─────────────────────────── */
     .gallery-card.is-single { cursor: zoom-in; }
-    .gallery-single-img { width: 100%; height: 240px; object-fit: cover; display: block; background: #e8eef2; }
+    .gallery-single-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: center; display: block; background: #e8eef2; }
     .gallery-caption { padding: 0 18px 15px; font-size: 13px; color: var(--muted); line-height: 1.55; margin-top: -4px; }
     .ba-pair figure { cursor: zoom-in; }
 
@@ -353,7 +357,6 @@
     @media (max-width: 640px) {
       .lb-btn { width: 44px; height: 44px; }
       .lb-prev { left: 6px; } .lb-next { right: 6px; }
-      .gallery-single-img { height: 200px; }
     }
 
     .testimonials-carousel { position: relative; max-width: 660px; margin: 44px auto 0; padding: 0 52px; }
@@ -824,8 +827,7 @@ color:#0c3f5e;
   <!-- BEFORE & AFTER GALLERY (managed from admin; hidden until it has projects) -->
   <section class="section gallery-section" id="gallery" style="display:none;">
     <div class="section-inner">
-      <div class="section-label">Our Work</div>
-      <h2 class="section-title">Before &amp; After</h2>
+      <h2 class="section-title">Our Work</h2>
       <p class="section-sub">Real projects from around Macomb County. See the difference for yourself.</p>
       <div class="gallery-grid" id="galleryGrid"></div>
     </div>
@@ -1316,10 +1318,14 @@ color:#0c3f5e;
             if (!g.imageUrl) return '';
             const i = shots.length;
             shots.push({ src: g.imageUrl, cap: [g.title, g.caption].filter(Boolean).join(' \u2014 ') });
+            // Don't print the caption when it just repeats the title — easy to do
+            // by accident in admin, and it reads as a mistake on the live site.
+            const sameText = g.caption && g.title
+              && g.caption.trim().toLowerCase() === g.title.trim().toLowerCase();
             return '<div class="gallery-card is-single reveal visible">'
               + '<img class="gallery-single-img" loading="lazy" src="' + esc(g.imageUrl) + '" alt="' + esc(g.title || 'Blade Masters project photo') + '" data-shot="' + i + '">'
               + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
-              + (g.caption ? '<div class="gallery-caption">' + esc(g.caption) + '</div>' : '')
+              + (g.caption && !sameText ? '<div class="gallery-caption">' + esc(g.caption) + '</div>' : '')
               + '</div>';
           }
 
