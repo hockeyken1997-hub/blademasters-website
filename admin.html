@@ -454,9 +454,6 @@
       getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc,
       query, orderBy, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAI-U6atVom3DwfUWIhLoRU1G9aHnaaU1Y",
@@ -470,7 +467,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     // ── DOM refs ──
     const loginScreen = document.getElementById('login-screen');
@@ -1103,6 +1099,43 @@
       return (str || '').replace(/"/g, '&quot;');
     }
 
+    // ── Image uploads (Cloudinary) ──────────────────────────────────────────
+    // Firebase Storage requires the paid Blaze plan, so uploads go straight from
+    // the browser to Cloudinary instead and only the returned URL is stored in
+    // Firestore. The preset is unsigned by necessity — there is no server here to
+    // hold a signing secret — so abuse is limited in the Cloudinary preset itself
+    // (max file size, allowed formats) rather than by keeping the name private.
+    const CLOUDINARY_CLOUD  = 'vzvbevi1';
+    const CLOUDINARY_PRESET = 'blade_masters_unsigned';
+
+    function uploadToCloudinary(file) {
+      return new Promise((resolve, reject) => {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('upload_preset', CLOUDINARY_PRESET);
+
+        // XHR rather than fetch: it reports real upload progress, which matters
+        // when you're posting a 9MB job photo over truck-side signal.
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload');
+        xhr.timeout = 120000;
+
+        xhr.onload = () => {
+          let data = null;
+          try { data = JSON.parse(xhr.responseText); } catch (e) { /* fall through */ }
+          if (xhr.status >= 200 && xhr.status < 300 && data && data.secure_url) {
+            resolve(data.secure_url);
+          } else {
+            const msg = data && data.error && data.error.message ? data.error.message : 'Upload rejected (' + xhr.status + ')';
+            reject(new Error(msg));
+          }
+        };
+        xhr.onerror   = () => reject(new Error('Network error during upload.'));
+        xhr.ontimeout = () => reject(new Error('Upload timed out. Try a smaller photo or better signal.'));
+        xhr.send(form);
+      });
+    }
+
     function wireUpload(container, zoneSelector, inputSelector, onDone) {
       const zone = container.querySelector(zoneSelector);
       const fileInput = container.querySelector(inputSelector);
@@ -1115,18 +1148,23 @@
           showToast('That image is too large. Keep photos under 10MB.', true);
           return;
         }
+        if (!/^image\//.test(file.type)) {
+          showToast('That file is not an image. Use a JPG, PNG or WebP.', true);
+          fileInput.value = '';
+          return;
+        }
         if (progressEl) progressEl.style.display = 'block';
         try {
-          const path = 'blog-images/' + Date.now() + '-' + file.name.replace(/[^\w.\-]/g, '_');
-          const storageRef = ref(storage, path);
-          await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(storageRef);
+          const url = await uploadToCloudinary(file);
           onDone(url);
           showToast('Photo uploaded');
         } catch (err) {
-          showToast('Upload failed. Check your connection and try again.', true);
+          console.error('Upload failed:', err);
+          showToast(err && err.message ? err.message : 'Upload failed. Check your connection and try again.', true);
         } finally {
           if (progressEl) progressEl.style.display = 'none';
+          // Clear the input so re-picking the SAME file still fires 'change'.
+          fileInput.value = '';
         }
       });
     }
