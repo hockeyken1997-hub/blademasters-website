@@ -194,6 +194,17 @@
       overflow: visible; z-index: 4;
     }
 
+    /* Faded mower-stripe ground so the divider grass has something to root in. */
+    .grass-ground {
+      position: absolute; left: 0; right: 0; top: -6px; height: 200px;
+      pointer-events: none; z-index: 0;
+      background: repeating-linear-gradient(74deg,
+        var(--g1, #2a6b41) 0 34px, var(--g2, #1e5233) 34px 68px);
+      -webkit-mask: linear-gradient(to bottom, #000 0%, #000 10%, transparent 62%);
+              mask: linear-gradient(to bottom, #000 0%, #000 10%, transparent 62%);
+    }
+    #reviews { --g1: #2a6b41; --g2: #1e5233; }
+
     /* ── Scroll progress line (a mower pass across the top) ── */
     .scroll-progress {
       position: fixed; top: 0; left: 0; z-index: 400;
@@ -985,6 +996,7 @@ color:#0c3f5e;
 
   <section class="section testimonials-section" id="reviews">
     <div class="grass-divider" id="reviewsGrass" aria-hidden="true"></div>
+    <div class="grass-ground" aria-hidden="true"></div>
     <div class="section-inner">
       <div class="section-label" style="color:var(--teal);">What Clients Say</div>
       <h2 class="section-title" style="color:var(--text);">Real Reviews</h2>
