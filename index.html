@@ -141,7 +141,7 @@
     .nav-cta {
       background: var(--accent); color: var(--navy-dark);
       font-weight: 800; font-size: 13px; padding: 10px 22px;
-      border-radius: 8px; border: none; cursor: pointer;
+      border-radius: 4px; border: none; cursor: pointer;
       text-decoration: none; transition: all 0.15s; letter-spacing: 0.3px;
       white-space: nowrap;
     }
@@ -185,7 +185,7 @@
       background: rgba(166,208,102,0.12); border: 1px solid rgba(166,208,102,0.35);
       color: var(--accent); font-size: 11px; font-weight: 700;
       letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 6px 16px; border-radius: 100px; margin-bottom: 22px;
+      padding: 6px 16px; border-radius: 4px; margin-bottom: 22px;
     }
     .hero-title {
       font-family: 'Bebas Neue', sans-serif;
@@ -201,7 +201,7 @@
     .btn-primary {
       background: var(--accent); color: var(--navy-dark);
       font-weight: 800; font-size: 15px; padding: 16px 32px;
-      border-radius: 10px; border: none; cursor: pointer;
+      border-radius: 4px; border: none; cursor: pointer;
       text-decoration: none; display: inline-flex; align-items: center;
       gap: 8px; transition: all 0.15s;
     }
@@ -209,7 +209,7 @@
     .btn-outline {
       background: transparent; color: var(--white);
       font-weight: 700; font-size: 15px; padding: 16px 32px;
-      border-radius: 10px; border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 4px; border: 2px solid rgba(255,255,255,0.25);
       cursor: pointer; text-decoration: none; display: inline-flex;
       align-items: center; gap: 8px; transition: all 0.15s;
     }
@@ -256,14 +256,14 @@
     }
     .service-card {
       background: var(--off-white); border: 1px solid var(--border);
-      border-radius: 16px; padding: 28px 24px;
+      border-radius: 6px; padding: 28px 24px;
       transition: all 0.2s; position: relative; overflow: hidden;
     }
     .service-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.2s;
     }
-    .service-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(17,85,124,0.12); }
+    .service-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 4px 16px rgba(17,85,124,0.10); }
     .service-card:hover::before { transform: scaleX(1); }
     .ic { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .service-icon { font-size: 34px; margin-bottom: 14px; display: block; color: var(--navy); }
@@ -285,7 +285,7 @@
       text-align: center; padding: 0 20px 0; position: relative; z-index: 1;
     }
     .step-num {
-      width: 64px; height: 64px; border-radius: 50%;
+      width: 64px; height: 64px; border-radius: 4px;
       background: var(--accent); color: var(--navy-dark);
       font-family: 'Bebas Neue', sans-serif; font-size: 28px;
       display: flex; align-items: center; justify-content: center;
@@ -301,21 +301,46 @@
     }
     .why-card {
       background: var(--off-white); border: 1px solid var(--border);
-      border-radius: 16px; padding: 26px 22px; transition: all 0.2s;
+      border-radius: 6px; padding: 26px 22px; transition: all 0.2s;
     }
-    .why-card:hover { border-color: var(--navy); box-shadow: 0 4px 20px rgba(17,85,124,0.08); }
+    .why-card:hover { border-color: var(--navy); box-shadow: 0 2px 12px rgba(17,85,124,0.08); }
     .why-icon { font-size: 28px; margin-bottom: 12px; display: block; color: var(--navy); }
     .why-title { font-weight: 800; font-size: 15px; color: var(--text); margin-bottom: 6px; }
     .why-text { font-size: 13px; color: var(--muted); line-height: 1.65; }
 
     /* ── TESTIMONIALS ── */
     .testimonials-section { background: var(--navy-dark); }
-    .gallery-grid {
-      display: grid; gap: 24px; margin-top: 44px;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
-      justify-content: center;
+    /* ── Our Work: two slideshows (before/after, and single photos) ── */
+    .work-show + .work-show { margin-top: 56px; }
+    .work-show { margin-top: 40px; }
+    .work-show-title { text-align: center; font-size: 18px; font-weight: 800; color: var(--navy); margin: 0 0 16px; }
+    .slideshow { max-width: 560px; margin: 0 auto; }
+    .slideshow-viewport { overflow: hidden; border-radius: 6px; }
+    .slideshow-track { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+    .slide { flex: 0 0 100%; min-width: 0; }
+    .slide > .gallery-card { height: 100%; }
+    .slideshow-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .slideshow-btn {
+      width: 44px; height: 44px; border-radius: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--off-white); color: var(--navy);
+      border: 1.5px solid var(--border); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
     }
-    .gallery-card { background: var(--off-white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .slideshow-btn:hover, .slideshow-btn:focus-visible { border-color: var(--teal); color: var(--teal); }
+    .slideshow-btn:focus-visible, .slideshow-dot:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+    .slideshow-dots { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; justify-content: center; }
+    .slideshow-dot { position: relative; width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; }
+    .slideshow-dot::after {
+      content: ""; position: absolute; inset: 8px; border-radius: 4px;
+      background: var(--border); transition: background 0.2s, transform 0.2s;
+    }
+    .slideshow-dot[aria-current="true"]::after { background: var(--navy); transform: scale(1.25); }
+    @media (prefers-reduced-motion: reduce) {
+      .slideshow-track, .slideshow-dot::after, .slideshow-btn { transition: none; }
+    }
+
+    .gallery-card { background: var(--off-white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
     .ba-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
     .ba-pair figure { margin: 0; position: relative; }
     .ba-pair img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: center; display: block; background: #e8eef2; }
@@ -325,8 +350,8 @@
 
     /* ── Blog teaser cards ─────────────────────────────────────────── */
     .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 44px; }
-    .blog-card { display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
-    .blog-card:hover, .blog-card:focus-visible { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(17,85,124,0.14); border-color: var(--teal); }
+    .blog-card { display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; text-decoration: none; color: inherit; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+    .blog-card:hover, .blog-card:focus-visible { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(17,85,124,0.12); border-color: var(--teal); }
     .blog-card:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
     .blog-card-img { width: 100%; height: 168px; object-fit: cover; display: block; background: var(--navy-light); }
     .blog-card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
@@ -342,7 +367,7 @@
       display: inline-flex; align-items: center; gap: 8px;
       background: transparent; color: var(--navy);
       font-weight: 700; font-size: 15px; padding: 14px 30px;
-      border-radius: 10px; border: 2px solid var(--border);
+      border-radius: 4px; border: 2px solid var(--border);
       text-decoration: none; transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
     .blog-all-btn:hover, .blog-all-btn:focus-visible { border-color: var(--teal); color: var(--teal); background: var(--navy-light); }
@@ -367,13 +392,13 @@
     .lb-figure { margin: 0; max-width: 1100px; width: 100%; text-align: center; }
     .lb-img {
       max-width: 100%; max-height: 78vh; object-fit: contain;
-      border-radius: 10px; display: block; margin: 0 auto;
+      border-radius: 4px; display: block; margin: 0 auto;
     }
     .lb-cap { color: #e8f0f4; font-size: 14px; line-height: 1.6; margin-top: 14px; }
     .lb-count { color: rgba(232,240,244,0.6); font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-top: 6px; }
     .lb-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
-      width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+      width: 52px; height: 52px; border-radius: 4px; cursor: pointer;
       background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
       color: #fff; display: flex; align-items: center; justify-content: center;
       transition: background 0.15s;
@@ -390,7 +415,7 @@
     .tc-viewport { overflow: hidden; }
     .tc-track { display: flex; transition: transform 0.5s ease; }
     .tc-track > .testimonial-card { flex: 0 0 100%; margin: 0; box-sizing: border-box; }
-    .tc-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%;
+    .tc-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 4px;
       background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff;
       display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; transition: background 0.15s, border-color 0.15s; }
     .tc-arrow:hover { background: var(--accent); border-color: var(--accent); color: var(--navy-dark); }
@@ -403,7 +428,7 @@
     @media (max-width: 560px) { .testimonials-carousel { padding: 0 40px; } .tc-arrow { width: 34px; height: 34px; } .tc-arrow svg { width: 18px; height: 18px; } }
     .testimonial-card {
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 26px 24px;
+      border-radius: 6px; padding: 26px 24px;
     }
     .stars { color: var(--accent); font-size: 16px; margin-bottom: 12px; letter-spacing: 2px; }
     .testimonial-text { font-size: 14px; color: rgba(255,255,255,0.78); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
@@ -417,7 +442,7 @@
     }
     .area-pill {
       background: var(--white); border: 1.5px solid var(--border);
-      border-radius: 100px; padding: 8px 18px;
+      border-radius: 4px; padding: 8px 18px;
       font-size: 13px; font-weight: 700; color: var(--navy);
       transition: all 0.15s;
     }
@@ -425,7 +450,7 @@
     .area-pill.highlight { background: var(--navy); color: var(--white); border-color: var(--navy); }
     .area-map-wrap {
       margin-top: 32px; background: var(--white);
-      border: 1px solid var(--border); border-radius: 20px;
+      border: 1px solid var(--border); border-radius: 6px;
       padding: clamp(16px, 3vw, 28px); overflow: hidden;
     }
     .area-map { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; }
@@ -434,7 +459,7 @@
     .faq-list { margin-top: 40px; display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
     .faq-item {
       background: var(--off-white); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
+      border-radius: 6px; overflow: hidden;
     }
     .faq-q {
       padding: 18px 20px; font-weight: 700; font-size: 15px; color: var(--text);
@@ -456,8 +481,8 @@
     .form-wrapper { max-width: 700px; margin: 0 auto; }
     .form-card {
       background: var(--white); border: 1px solid var(--border);
-      border-radius: 20px; padding: clamp(24px,5vw,48px);
-      margin-top: 44px; box-shadow: 0 4px 32px rgba(17,85,124,0.08);
+      border-radius: 6px; padding: clamp(24px,5vw,48px);
+      margin-top: 44px; box-shadow: 0 2px 12px rgba(17,85,124,0.08);
     }
     .form-section-head {
       font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
@@ -474,7 +499,7 @@
     input[type="text"], input[type="tel"], input[type="email"], select, textarea {
       font-family: 'Outfit', sans-serif; font-size: 15px; color: var(--text);
       background: var(--off-white); border: 1.5px solid var(--border);
-      border-radius: 10px; padding: 12px 14px; outline: none; width: 100%;
+      border-radius: 4px; padding: 12px 14px; outline: none; width: 100%;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
     input:focus, select:focus, textarea:focus {
@@ -486,7 +511,7 @@
     .service-check {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; border: 1.5px solid var(--border);
-      border-radius: 10px; cursor: pointer; transition: all 0.15s; user-select: none;
+      border-radius: 4px; cursor: pointer; transition: all 0.15s; user-select: none;
     }
     .service-check:hover { border-color: var(--navy); background: var(--navy-light); }
     .service-check.checked { border-color: var(--navy); background: var(--navy-light); }
@@ -499,13 +524,13 @@
     .submit-btn {
       width: 100%; background: var(--navy); color: var(--white);
       font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 16px;
-      padding: 18px; border-radius: 12px; border: none; cursor: pointer;
+      padding: 18px; border-radius: 6px; border: none; cursor: pointer;
       transition: all 0.15s; display: flex; align-items: center;
       justify-content: center; gap: 10px; margin-top: 24px;
     }
     .submit-btn:hover:not(:disabled) { background: var(--navy-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(17,85,124,0.25); }
     .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; }
-    .form-error { display: none; background: #fde8e8; border: 1px solid #f0b0b0; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #c0392b; margin-top: 12px; }
+    .form-error { display: none; background: #fde8e8; border: 1px solid #f0b0b0; border-radius: 4px; padding: 12px 16px; font-size: 13px; color: #c0392b; margin-top: 12px; }
 
 
     /* ── GAME SECTION ── */
@@ -529,11 +554,11 @@
       width: 100%; max-width: 520px;
       background: rgba(0,0,0,0.4);
       border: 2px solid rgba(166,208,102,0.3);
-      border-radius: 16px; overflow: hidden;
+      border-radius: 6px; overflow: hidden;
       position: relative; cursor: pointer;
       transition: all 0.2s;
     }
-    .game-preview:hover { border-color: #a6d066; transform: translateY(-3px); box-shadow: 0 12px 40px rgba(166,208,102,0.2); }
+    .game-preview:hover { border-color: #a6d066; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(166,208,102,0.2); }
     .game-preview-inner {
       padding: 32px 24px; display: flex; flex-direction: column;
       align-items: center; gap: 16px;
@@ -547,7 +572,7 @@
     .game-play-btn {
       background: #a6d066; color: #0c3f5e;
       font-weight: 800; font-size: 16px; padding: 14px 36px;
-      border-radius: 10px; border: none; cursor: pointer;
+      border-radius: 4px; border: none; cursor: pointer;
       display: inline-flex; align-items: center; gap: 8px;
       transition: all 0.15s; letter-spacing: 0.3px;
       font-family: 'Outfit', sans-serif;
@@ -558,7 +583,7 @@
     }
     .game-badge {
       background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 100px; padding: 6px 14px;
+      border-radius: 4px; padding: 6px 14px;
       font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600;
     }
 
@@ -574,7 +599,7 @@
     .game-modal {
       width: 100%; max-width: 640px;
       background: #11557c;
-      border-radius: 16px;
+      border-radius: 6px;
       border: 2px solid #a6d066;
       overflow: hidden;
       position: relative;
@@ -583,7 +608,7 @@
     }
     .game-modal-close {
       position: absolute; top: 10px; right: 10px; z-index: 10;
-      width: 32px; height: 32px; border-radius: 50%;
+      width: 32px; height: 32px; border-radius: 4px;
       background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
       color: #fff; font-size: 16px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
@@ -640,7 +665,7 @@
     }
     .mobile-cta-bar a {
       flex: 1; text-align: center; padding: 13px 10px;
-      border-radius: 10px; font-weight: 800; font-size: 14px;
+      border-radius: 4px; font-weight: 800; font-size: 14px;
       text-decoration: none; transition: all 0.15s;
     }
     .mobile-cta-call { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
@@ -665,7 +690,7 @@ border-bottom:1px solid rgba(255,255,255,.1);
 .site-tab{
 border:none;
 padding:10px 18px;
-border-radius:8px;
+border-radius: 4px;
 background:rgba(255,255,255,.12);
 color:#fff;
 font-weight:700;
@@ -851,12 +876,19 @@ color:#0c3f5e;
   </section>
 
   <!-- TESTIMONIALS -->
-  <!-- BEFORE & AFTER GALLERY (managed from admin; hidden until it has projects) -->
+  <!-- OUR WORK: two slideshows, managed from admin. Section and each show stay hidden until they have projects. -->
   <section class="section gallery-section" id="gallery" style="display:none;">
     <div class="section-inner">
       <h2 class="section-title">Our Work</h2>
       <p class="section-sub">Real projects from around Macomb County. See the difference for yourself.</p>
-      <div class="gallery-grid" id="galleryGrid"></div>
+      <div class="work-show" id="workBeforeAfter" hidden>
+        <h3 class="work-show-title">Before &amp; After</h3>
+        <div class="slideshow" id="beforeAfterShow"></div>
+      </div>
+      <div class="work-show" id="workProjects" hidden>
+        <h3 class="work-show-title">Recent Projects</h3>
+        <div class="slideshow" id="projectsShow"></div>
+      </div>
     </div>
   </section>
 
@@ -1322,69 +1354,180 @@ color:#0c3f5e;
     }
     initReviewsCarousel();
 
-    // Gallery (managed from admin). Holds two kinds of entry:
-    //   kind === 'single' -> one photo + optional caption
-    //   kind === 'pair'   -> before/after pair
-    // Entries created before `kind` existed have none, so they're inferred from
-    // which URLs they carry. Singles render first, then pairs.
-    // Every photo is clickable and opens a shared lightbox.
-    (async function renderGallery() {
-      const grid = document.getElementById('galleryGrid');
+    // ── Our Work ─────────────────────────────────────────────────────────
+    // Admin entries come in two kinds: kind === 'single' (one photo + optional
+    // caption) and kind === 'pair' (before/after). Entries saved before `kind`
+    // existed have none, so the kind is inferred from which URLs they carry.
+    // Pairs and singles each get their own slideshow. Every photo opens a
+    // shared lightbox.
+    const SLIDE_INTERVAL_MS = 6000;
+    const ICON_PREV = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
+    const ICON_NEXT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    const ICON_PAUSE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+    const ICON_PLAY = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7 4 20 12 7 20"/></svg>';
+
+    function slideshowControlsHtml(count) {
+      const dots = Array.from({ length: count }, (_, k) =>
+        '<button type="button" class="slideshow-dot" data-go="' + k + '" aria-label="Show slide ' + (k + 1) + ' of ' + count + '"></button>'
+      ).join('');
+      return '<div class="slideshow-controls">'
+        + '<button type="button" class="slideshow-btn" data-step="-1" aria-label="Previous slide">' + ICON_PREV + '</button>'
+        + '<div class="slideshow-dots">' + dots + '</div>'
+        + '<button type="button" class="slideshow-btn" data-step="1" aria-label="Next slide">' + ICON_NEXT + '</button>'
+        + '<button type="button" class="slideshow-btn" data-pause aria-label="Pause slideshow">' + ICON_PAUSE + '</button>'
+        + '</div>';
+    }
+
+    /**
+     * Builds a slideshow inside `root` from ready-made slide HTML. Autoplays,
+     * pauses on hover or keyboard focus, on the Pause button, and when the tab
+     * is hidden. Autoplay is off entirely for reduced-motion users. Hides its
+     * parent box when there are no slides.
+     */
+    function mountSlideshow(root, slideHtmls, label) {
+      const count = slideHtmls.length;
+      root.parentElement.hidden = count === 0;
+      if (count === 0) return;
+
+      root.setAttribute('role', 'region');
+      root.setAttribute('aria-roledescription', 'carousel');
+      root.setAttribute('aria-label', label);
+      root.innerHTML =
+        '<div class="slideshow-viewport"><div class="slideshow-track">'
+        + slideHtmls.map((html, i) =>
+            '<div class="slide" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' of ' + count + '">' + html + '</div>'
+          ).join('')
+        + '</div></div>'
+        + (count > 1 ? slideshowControlsHtml(count) : '');
+
+      const track = root.querySelector('.slideshow-track');
+      const viewport = root.querySelector('.slideshow-viewport');
+      const dots = [...root.querySelectorAll('.slideshow-dot')];
+      const pauseBtn = root.querySelector('[data-pause]');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let index = 0;
+      let timer = null;
+      let userPaused = false;
+      let hovered = false;
+      let focused = false;
+      let touchStartX = null;
+
+      const goTo = i => {
+        index = (i + count) % count;
+        track.style.transform = 'translateX(' + (-index * 100) + '%)';
+        dots.forEach((dot, k) => dot.setAttribute('aria-current', k === index ? 'true' : 'false'));
+      };
+
+      const stopTimer = () => { clearInterval(timer); timer = null; };
+
+      const syncAutoplay = () => {
+        stopTimer();
+        const canAutoplay = count > 1 && !userPaused && !hovered && !focused
+          && !reduceMotion.matches && !document.hidden;
+        if (canAutoplay) timer = setInterval(() => goTo(index + 1), SLIDE_INTERVAL_MS);
+      };
+
+      // Manual navigation restarts the timer so a slide isn't cut short.
+      const moveTo = i => { goTo(i); syncAutoplay(); };
+
+      if (count > 1) {
+        root.querySelectorAll('[data-step]').forEach(btn =>
+          btn.addEventListener('click', () => moveTo(index + Number(btn.dataset.step))));
+        dots.forEach(dot => dot.addEventListener('click', () => moveTo(Number(dot.dataset.go))));
+
+        pauseBtn.addEventListener('click', () => {
+          userPaused = !userPaused;
+          pauseBtn.setAttribute('aria-label', userPaused ? 'Play slideshow' : 'Pause slideshow');
+          pauseBtn.innerHTML = userPaused ? ICON_PLAY : ICON_PAUSE;
+          syncAutoplay();
+        });
+
+        root.addEventListener('keydown', e => {
+          if (e.key === 'ArrowLeft') moveTo(index - 1);
+          else if (e.key === 'ArrowRight') moveTo(index + 1);
+        });
+
+        root.addEventListener('mouseenter', () => { hovered = true; syncAutoplay(); });
+        root.addEventListener('mouseleave', () => { hovered = false; syncAutoplay(); });
+        // Only keyboard focus pauses the show. A mouse click on a button would
+        // otherwise leave it stuck paused.
+        root.addEventListener('focusin', e => {
+          if (e.target.matches(':focus-visible')) { focused = true; syncAutoplay(); }
+        });
+        root.addEventListener('focusout', e => {
+          if (!root.contains(e.relatedTarget)) { focused = false; syncAutoplay(); }
+        });
+
+        viewport.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+        viewport.addEventListener('touchend', e => {
+          if (touchStartX === null) return;
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          touchStartX = null;
+          if (Math.abs(dx) > 45) moveTo(index + (dx < 0 ? 1 : -1));
+        }, { passive: true });
+      }
+
+      document.addEventListener('visibilitychange', syncAutoplay);
+      if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', syncAutoplay);
+
+      goTo(0);
+      syncAutoplay();
+    }
+
+    (async function renderOurWork() {
       const section = document.getElementById('gallery');
-      if (!grid || !section) return;
+      const pairsShow = document.getElementById('beforeAfterShow');
+      const singlesShow = document.getElementById('projectsShow');
+      if (!section || !pairsShow || !singlesShow) return;
       const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
 
-      // Flat list of every image on show, in DOM order, so the lightbox can page
-      // through the whole gallery rather than one card at a time.
+      // Flat list of every image on show, in the order the slides appear, so the
+      // lightbox pages through the whole section.
       const shots = [];
 
       try {
         const snap = await getDocs(query(collection(db, 'gallery'), where('active', '==', true)));
         if (snap.empty) return;
-        const arr = [];
-        snap.forEach(d => arr.push(d.data()));
+        const items = [];
+        snap.forEach(d => items.push(d.data()));
 
         const kindOf = g => g.kind || (g.imageUrl && !g.beforeUrl ? 'single' : 'pair');
-        arr.sort((a, b) => {
-          const ka = kindOf(a) === 'single' ? 0 : 1;
-          const kb = kindOf(b) === 'single' ? 0 : 1;
-          if (ka !== kb) return ka - kb;
-          return (a.order ?? 0) - (b.order ?? 0);
-        });
+        const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
+        const pairs = items.filter(g => kindOf(g) === 'pair' && g.beforeUrl && g.afterUrl).sort(byOrder);
+        const singles = items.filter(g => kindOf(g) === 'single' && g.imageUrl).sort(byOrder);
 
-        grid.innerHTML = arr.map(g => {
-          const kind = kindOf(g);
-
-          if (kind === 'single') {
-            if (!g.imageUrl) return '';
-            const i = shots.length;
-            shots.push({ src: g.imageUrl, cap: [g.title, g.caption].filter(Boolean).join(' \u2014 ') });
-            // Don't print the caption when it just repeats the title — easy to do
-            // by accident in admin, and it reads as a mistake on the live site.
-            const sameText = g.caption && g.title
-              && g.caption.trim().toLowerCase() === g.title.trim().toLowerCase();
-            return '<div class="gallery-card is-single reveal visible">'
-              + '<img class="gallery-single-img" loading="lazy" src="' + esc(g.imageUrl) + '" alt="' + esc(g.title || 'Blade Masters project photo') + '" data-shot="' + i + '">'
-              + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
-              + (g.caption && !sameText ? '<div class="gallery-caption">' + esc(g.caption) + '</div>' : '')
-              + '</div>';
-          }
-
-          if (!g.beforeUrl || !g.afterUrl) return '';
+        const pairSlides = pairs.map(g => {
           const ib = shots.length;
-          shots.push({ src: g.beforeUrl, cap: (g.title ? g.title + ' \u2014 ' : '') + 'Before' });
+          shots.push({ src: g.beforeUrl, cap: (g.title ? g.title + ' — ' : '') + 'Before' });
           const ia = shots.length;
-          shots.push({ src: g.afterUrl, cap: (g.title ? g.title + ' \u2014 ' : '') + 'After' });
-          return '<div class="gallery-card reveal visible">'
+          shots.push({ src: g.afterUrl, cap: (g.title ? g.title + ' — ' : '') + 'After' });
+          return '<div class="gallery-card">'
             + '<div class="ba-pair">'
               + '<figure><img loading="lazy" src="' + esc(g.beforeUrl) + '" alt="Before" data-shot="' + ib + '"><figcaption>Before</figcaption></figure>'
               + '<figure><img loading="lazy" src="' + esc(g.afterUrl) + '" alt="After" data-shot="' + ia + '"><figcaption>After</figcaption></figure>'
             + '</div>'
             + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
             + '</div>';
-        }).join('');
+        });
 
-        if (!grid.innerHTML.trim()) return;
+        const singleSlides = singles.map(g => {
+          const i = shots.length;
+          shots.push({ src: g.imageUrl, cap: [g.title, g.caption].filter(Boolean).join(' — ') });
+          // Skip the caption when it just repeats the title, which is easy to do
+          // by accident in admin and reads as a mistake on the live site.
+          const sameText = g.caption && g.title
+            && g.caption.trim().toLowerCase() === g.title.trim().toLowerCase();
+          return '<div class="gallery-card is-single">'
+            + '<img class="gallery-single-img" loading="lazy" src="' + esc(g.imageUrl) + '" alt="' + esc(g.title || 'Blade Masters project photo') + '" data-shot="' + i + '">'
+            + (g.title ? '<div class="gallery-title">' + esc(g.title) + (g.service ? ' <span class="gallery-service">' + esc(g.service) + '</span>' : '') + '</div>' : '')
+            + (g.caption && !sameText ? '<div class="gallery-caption">' + esc(g.caption) + '</div>' : '')
+            + '</div>';
+        });
+
+        if (shots.length === 0) return;
+
+        mountSlideshow(pairsShow, pairSlides, 'Before and after projects');
+        mountSlideshow(singlesShow, singleSlides, 'Recent project photos');
         section.style.display = '';
 
         // ── Lightbox ──
@@ -1419,7 +1562,8 @@ color:#0c3f5e;
           if (lastFocus && lastFocus.focus) lastFocus.focus();
         };
 
-        grid.addEventListener('click', e => {
+        // One delegated listener covers every slide, including ones added later.
+        section.addEventListener('click', e => {
           const t = e.target.closest('[data-shot]');
           if (!t) return;
           open(parseInt(t.dataset.shot, 10) || 0);
@@ -1626,22 +1770,22 @@ color:#0c3f5e;
         document.documentElement.style.scrollBehavior = 'auto';
         document.body.innerHTML = `
           <div style="min-height:100vh;background:#0c3f5e;display:flex;align-items:center;justify-content:center;padding:32px 20px;font-family:'Outfit',sans-serif;">
-            <div style="background:#fff;border-radius:24px;padding:clamp(32px,6vw,56px);max-width:520px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-              <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#a6d066,#7aab3a);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 24px;box-shadow:0 8px 24px rgba(166,208,102,0.4);"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#0c3f5e"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="background:#fff;border-radius:6px;padding:clamp(32px,6vw,56px);max-width:520px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+              <div style="width:84px;height:84px;border-radius:6px;background:linear-gradient(135deg,#a6d066,#7aab3a);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 24px;box-shadow:0 8px 24px rgba(166,208,102,0.4);"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#0c3f5e"><polyline points="20 6 9 17 4 12"/></svg></div>
               <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,52px);color:#11557c;letter-spacing:1px;margin-bottom:8px;line-height:1;">Thank You!</h1>
               <p style="font-size:17px;font-weight:700;color:#1a2530;margin-bottom:14px;">Your request was sent successfully.</p>
               <p style="font-size:14px;color:#4a5a6a;line-height:1.7;margin-bottom:28px;">We'll get back to you within 24 business hours to go over your quote. Need something sooner? Call or text us:</p>
-              <a href="tel:+15864950348" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#11557c;color:#fff;font-weight:800;font-size:16px;padding:15px 32px;border-radius:12px;text-decoration:none;margin-bottom:28px;width:100%;box-sizing:border-box;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> (586) 495-0348</a>
+              <a href="tel:+15864950348" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#11557c;color:#fff;font-weight:800;font-size:16px;padding:15px 32px;border-radius:6px;text-decoration:none;margin-bottom:28px;width:100%;box-sizing:border-box;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> (586) 495-0348</a>
               <div style="display:flex;gap:12px;justify-content:center;margin-bottom:32px;flex-wrap:wrap;">
-                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:12px;padding:14px 16px;flex:1;min-width:100px;">
+                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:6px;padding:14px 16px;flex:1;min-width:100px;">
                   <div style="font-size:24px;margin-bottom:6px;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#11557c"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
                   <div style="font-size:11px;font-weight:800;color:#11557c;text-transform:uppercase;letter-spacing:0.5px;">Request<br>Received</div>
                 </div>
-                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:12px;padding:14px 16px;flex:1;min-width:100px;">
+                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:6px;padding:14px 16px;flex:1;min-width:100px;">
                   <div style="font-size:24px;margin-bottom:6px;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#11557c"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
                   <div style="font-size:11px;font-weight:800;color:#4a5a6a;text-transform:uppercase;letter-spacing:0.5px;">We'll Be<br>in Touch</div>
                 </div>
-                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:12px;padding:14px 16px;flex:1;min-width:100px;">
+                <div style="background:#f6f8fa;border:1px solid #ccd8e0;border-radius:6px;padding:14px 16px;flex:1;min-width:100px;">
                   <div style="font-size:24px;margin-bottom:6px;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#11557c"><path d="M3 21h18"/><path d="M6 21c0-4 0-6 1.6-8.6"/><path d="M6 21c0-3 0-5-1.3-7"/><circle cx="9" cy="8" r="2"/><path d="M11 8h4l2 4h2.5"/><circle cx="19.5" cy="14" r="1.5"/><path d="M15 12v9"/></svg></div>
                   <div style="font-size:11px;font-weight:800;color:#4a5a6a;text-transform:uppercase;letter-spacing:0.5px;">We Get<br>to Work</div>
                 </div>
