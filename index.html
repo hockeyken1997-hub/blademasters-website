@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blade Masters | Lawn Care, Snow Removal & Landscaping | Metro Detroit</title>
   <!-- Favicon / app icons (Blade Masters M badge). Real files Google can crawl for the search-result icon. -->
-  <link rel="icon" href="/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
   <meta name="theme-color" content="#11557c" />
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N0Z16CCZC"></script>
@@ -766,13 +766,15 @@
     .mobile-cta-bar {
       display: none; position: fixed; bottom: 0; left: 0; right: 0;
       background: var(--navy-dark); border-top: 1px solid rgba(166,208,102,0.2);
-      padding: 12px 16px; z-index: 150; gap: 10px;
+      padding: 10px 12px; z-index: 150; gap: 8px;
     }
     .mobile-cta-bar a {
-      flex: 1; text-align: center; padding: 13px 10px;
-      border-radius: 4px; font-weight: 800; font-size: 14px;
+      flex: 1; text-align: center; padding: 12px 6px;
+      border-radius: 4px; font-weight: 800; font-size: 13px;
       text-decoration: none; transition: all 0.15s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
     }
+    .mobile-cta-text { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
     .mobile-cta-call { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
     .mobile-cta-quote { background: var(--accent); color: var(--navy-dark); }
     @media(max-width:767px) { .mobile-cta-bar { display: flex; } body { padding-bottom: 72px; } }
@@ -1146,11 +1148,11 @@ color:#0c3f5e;
 
       <div class="area-grid">
         <div class="area-pill highlight"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Shelby Township</div>
-        <div class="area-pill highlight"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Troy</div>
+        <a href="troy.html" class="area-pill highlight" style="text-decoration:none;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Troy</a>
         <div class="area-pill highlight"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Utica</div>
-        <div class="area-pill">Sterling Heights</div>
+        <a href="sterling-heights.html" class="area-pill" style="text-decoration:none;">Sterling Heights</a>
         <div class="area-pill">Warren</div>
-        <div class="area-pill">Clinton Township</div>
+        <a href="clinton-township.html" class="area-pill" style="text-decoration:none;">Clinton Township</a>
         <div class="area-pill">Roseville</div>
         <div class="area-pill">Macomb</div>
         <div class="area-pill">Washington Township</div>
@@ -1368,8 +1370,9 @@ color:#0c3f5e;
 
   <!-- MOBILE STICKY CTA -->
   <div class="mobile-cta-bar">
-    <a href="tel:+15864950348" class="mobile-cta-call"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call Us</a>
-    <a href="#request" class="mobile-cta-quote"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Get a Quote</a>
+    <a href="sms:+15864950348" class="mobile-cta-text"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Text</a>
+    <a href="tel:+15864950348" class="mobile-cta-call"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call</a>
+    <a href="#request" class="mobile-cta-quote"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Quote</a>
   </div>
 
   <!-- Firebase + JS -->
@@ -2262,6 +2265,39 @@ window.addEventListener('DOMContentLoaded', function(){
   setTimeout(function(){ scrollToSection(id, false); }, 50);
 });
 </script>
+
+  <!-- City-page quote prefill: reads ?service=&type=&city= and fills the quote form. -->
+  <script>
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (!params.toString()) return;
+      var form = document.getElementById('quoteForm');
+      if (!form) return;
+      var city = params.get('city');
+      if (city) { var cityEl = document.getElementById('city'); if (cityEl) cityEl.value = city; }
+      var type = params.get('type');
+      if (type) {
+        var radio = form.querySelector('input[name="propertyType"][value="' + type + '"]');
+        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      var service = params.get('service');
+      if (service) {
+        service.split(',').forEach(function (val) {
+          val = val.trim().toLowerCase();
+          [].slice.call(form.querySelectorAll('input[type="checkbox"]')).forEach(function (cb) {
+            if ((cb.value || '').toLowerCase() === val) {
+              cb.checked = true;
+              cb.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        });
+      }
+      var sec = document.getElementById('request');
+      if (sec) setTimeout(function () { sec.scrollIntoView({ behavior: 'smooth' }); }, 150);
+    } catch (e) {}
+  })();
+  </script>
 </body>
 
 </html>
