@@ -282,6 +282,7 @@
         <button class="tab-btn" id="tab-editor-btn" style="display:none;">Editor</button>
         <button class="tab-btn" id="tab-reviews-btn">Reviews</button>
         <button class="tab-btn" id="tab-gallery-btn">Before / After</button>
+        <button class="tab-btn" id="tab-promos-btn">Popups</button>
       </div>
 
       <!-- POST LIST VIEW -->
@@ -457,6 +458,80 @@
           </div>
         </div>
       </div>
+
+      <!-- SEASONAL POPUPS VIEW -->
+      <div id="view-promos" style="display:none;">
+        <div class="list-toolbar">
+          <span class="list-count" id="promo-count">Loading…</span>
+          <button class="new-post-btn" id="new-promo-btn">+ New popup</button>
+        </div>
+        <div class="post-list" id="promo-list"></div>
+
+        <div id="promo-editor" class="review-editor" style="display:none;">
+          <div class="editor-field">
+            <label class="rev-active-label"><input type="checkbox" id="promo-enabled" checked /> Show on website (within the dates below)</label>
+          </div>
+          <div class="editor-field">
+            <label>Badge (small label above the title)</label>
+            <input type="text" id="promo-badge" placeholder="Winter 2026" />
+          </div>
+          <div class="editor-field">
+            <label>Title</label>
+            <input type="text" id="promo-title" placeholder="Snow Season Is Here" />
+          </div>
+          <div class="editor-field">
+            <label>Message</label>
+            <textarea id="promo-message" rows="3" placeholder="Lock in your snow contract before the first storm. Spots fill fast."></textarea>
+          </div>
+          <div class="editor-field">
+            <label>Button text</label>
+            <input type="text" id="promo-cta" placeholder="Get a Snow Quote" />
+          </div>
+          <div class="editor-row-2">
+            <div class="editor-field">
+              <label>Pre-fill service</label>
+              <select id="promo-service">
+                <option value="">None</option>
+                <option value="Lawn Mowing">Lawn Mowing</option>
+                <option value="Snow Removal">Snow Removal</option>
+                <option value="Bush/Shrub Trimming">Bush / Shrub Trimming</option>
+                <option value="Leaf Cleanup">Leaf Cleanup</option>
+                <option value="Bush/Tree/Flower Planting">Planting</option>
+                <option value="Landscape Install">Landscape Install</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="editor-field">
+              <label>Pre-fill property type</label>
+              <select id="promo-type">
+                <option value="">Any</option>
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+          </div>
+          <div class="editor-row-2">
+            <div class="editor-field">
+              <label>Start date</label>
+              <input type="date" id="promo-start" />
+            </div>
+            <div class="editor-field">
+              <label>End date</label>
+              <input type="date" id="promo-end" />
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>Display order (lower shows first if two are active)</label>
+            <input type="number" id="promo-order" placeholder="1" />
+          </div>
+          <div class="editor-footer">
+            <div class="editor-footer-actions">
+              <button class="btn-secondary" id="promo-cancel-btn">Cancel</button>
+              <button class="btn-primary" id="promo-save-btn">Save popup</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -583,6 +658,138 @@
     let galBeforeUrl = '';
     let galAfterUrl = '';
 
+    // ── Seasonal popups ──
+    const tabPromosBtn = document.getElementById('tab-promos-btn');
+    const viewPromos = document.getElementById('view-promos');
+    const promoListEl = document.getElementById('promo-list');
+    const promoCountEl = document.getElementById('promo-count');
+    const newPromoBtn = document.getElementById('new-promo-btn');
+    const promoEditor = document.getElementById('promo-editor');
+    const promoEnabled = document.getElementById('promo-enabled');
+    const promoBadge = document.getElementById('promo-badge');
+    const promoTitle = document.getElementById('promo-title');
+    const promoMessage = document.getElementById('promo-message');
+    const promoCta = document.getElementById('promo-cta');
+    const promoService = document.getElementById('promo-service');
+    const promoType = document.getElementById('promo-type');
+    const promoStart = document.getElementById('promo-start');
+    const promoEnd = document.getElementById('promo-end');
+    const promoOrder = document.getElementById('promo-order');
+    const promoSaveBtn = document.getElementById('promo-save-btn');
+    const promoCancelBtn = document.getElementById('promo-cancel-btn');
+    let currentPromoId = null;
+
+    function showPromosView() {
+      viewList.style.display = 'none';
+      viewEditor.style.display = 'none';
+      viewReviews.style.display = 'none';
+      viewGallery.style.display = 'none';
+      viewPromos.style.display = 'block';
+      promoEditor.style.display = 'none';
+      tabListBtn.classList.remove('active');
+      tabEditorBtn.classList.remove('active');
+      tabEditorBtn.style.display = 'none';
+      tabReviewsBtn.classList.remove('active');
+      tabGalleryBtn.classList.remove('active');
+      tabPromosBtn.classList.add('active');
+      loadPromos();
+    }
+    tabPromosBtn.addEventListener('click', showPromosView);
+
+    async function loadPromos() {
+      promoListEl.innerHTML = '';
+      promoCountEl.textContent = 'Loading…';
+      try {
+        const snap = await getDocs(query(collection(db, 'promos'), orderBy('order', 'asc')));
+        if (snap.empty) {
+          promoListEl.innerHTML = '<div class="empty-state">No popups yet. Click "New popup" to add a seasonal one.</div>';
+          promoCountEl.textContent = '0 popups';
+          return;
+        }
+        promoCountEl.textContent = snap.size + (snap.size === 1 ? ' popup' : ' popups');
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const on = d.enabled !== false;
+          const range = (d.startDate || '…') + ' \u2192 ' + (d.endDate || '…');
+          const row = document.createElement('div');
+          row.className = 'post-row' + (on ? '' : ' rev-inactive');
+          row.innerHTML =
+            '<div class="post-row-icon">📣</div>' +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escapeHtml(d.title || 'Untitled popup') + '</div>' +
+              '<div class="post-row-meta">' + escapeHtml(range) + (d.service ? ' · ' + escapeHtml(d.service) : '') + '</div>' +
+            '</div>' +
+            '<span class="post-badge ' + (on ? 'live' : 'draft') + '">' + (on ? 'On' : 'Off') + '</span>' +
+            '<span class="post-row-delete" data-id="' + docSnap.id + '">✕</span>';
+          row.addEventListener('click', e => { if (e.target.classList.contains('post-row-delete')) return; openPromoForEdit(docSnap.id, d); });
+          row.querySelector('.post-row-delete').addEventListener('click', e => { e.stopPropagation(); confirmDeletePromo(docSnap.id, d.title); });
+          promoListEl.appendChild(row);
+        });
+      } catch (err) {
+        promoListEl.innerHTML = '<div class="empty-state">Couldn\'t load popups. Refresh the page to try again.</div>';
+        promoCountEl.textContent = '';
+      }
+    }
+    function openPromoEditor() { promoEditor.style.display = 'block'; promoEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    newPromoBtn.addEventListener('click', () => {
+      currentPromoId = null;
+      promoEnabled.checked = true; promoBadge.value = ''; promoTitle.value = ''; promoMessage.value = '';
+      promoCta.value = ''; promoService.value = ''; promoType.value = ''; promoStart.value = ''; promoEnd.value = '';
+      promoOrder.value = promoListEl.querySelectorAll('.post-row').length + 1;
+      openPromoEditor();
+    });
+    function openPromoForEdit(id, d) {
+      currentPromoId = id;
+      promoEnabled.checked = d.enabled !== false;
+      promoBadge.value = d.badge || ''; promoTitle.value = d.title || ''; promoMessage.value = d.message || '';
+      promoCta.value = d.ctaText || ''; promoService.value = d.service || ''; promoType.value = d.propertyType || '';
+      promoStart.value = d.startDate || ''; promoEnd.value = d.endDate || '';
+      promoOrder.value = (d.order != null ? d.order : '');
+      openPromoEditor();
+    }
+    promoCancelBtn.addEventListener('click', () => { promoEditor.style.display = 'none'; });
+    promoSaveBtn.addEventListener('click', async () => {
+      const title = promoTitle.value.trim();
+      if (!title) { showToast('Add a title for the popup.', true); return; }
+      if (!promoMessage.value.trim()) { showToast('Add a message.', true); return; }
+      if (promoStart.value && promoEnd.value && promoEnd.value < promoStart.value) { showToast('End date is before the start date.', true); return; }
+      const data = {
+        enabled: promoEnabled.checked,
+        badge: promoBadge.value.trim() || null,
+        title,
+        message: promoMessage.value.trim(),
+        ctaText: promoCta.value.trim() || 'Get a Free Quote',
+        service: promoService.value || null,
+        propertyType: promoType.value || null,
+        startDate: promoStart.value || null,
+        endDate: promoEnd.value || null,
+        order: promoOrder.value !== '' ? parseInt(promoOrder.value, 10) : Date.now(),
+        updatedAt: serverTimestamp(),
+      };
+      promoSaveBtn.disabled = true; promoSaveBtn.textContent = 'Saving…';
+      try {
+        const id = currentPromoId || ('promo_' + Date.now());
+        if (!currentPromoId) data.createdAt = serverTimestamp();
+        await setDoc(doc(db, 'promos', id), data, { merge: true });
+        showToast('Popup saved');
+        promoEditor.style.display = 'none';
+        loadPromos();
+      } catch (err) {
+        showToast('Couldn\'t save that popup. Try again.', true);
+      } finally {
+        promoSaveBtn.disabled = false; promoSaveBtn.textContent = 'Save popup';
+      }
+    });
+    function confirmDeletePromo(id, title) {
+      confirmMessage.textContent = 'Delete "' + (title || 'this popup') + '"? This can\'t be undone.';
+      confirmOverlay.classList.add('show');
+      confirmOk.onclick = async () => {
+        confirmOverlay.classList.remove('show');
+        try { await deleteDoc(doc(db, 'promos', id)); showToast('Popup deleted'); loadPromos(); }
+        catch (err) { showToast('Couldn\'t delete that popup. Try again.', true); }
+      };
+    }
+
     // ── State ──
     let currentPostId = null;
     let currentReviewId = null;
@@ -667,6 +874,8 @@
       tabEditorBtn.style.display = 'none';
       tabReviewsBtn.classList.remove('active');
       tabGalleryBtn.classList.remove('active');
+      viewPromos.style.display = 'none';
+      tabPromosBtn.classList.remove('active');
       loadPostList();
     }
     function showEditorView() {
@@ -679,6 +888,8 @@
       tabEditorBtn.style.display = 'inline-block';
       tabReviewsBtn.classList.remove('active');
       tabGalleryBtn.classList.remove('active');
+      viewPromos.style.display = 'none';
+      tabPromosBtn.classList.remove('active');
     }
     function showReviewsView() {
       viewList.style.display = 'none';
@@ -691,6 +902,8 @@
       tabEditorBtn.style.display = 'none';
       tabReviewsBtn.classList.add('active');
       tabGalleryBtn.classList.remove('active');
+      viewPromos.style.display = 'none';
+      tabPromosBtn.classList.remove('active');
       loadReviews();
     }
     function showGalleryView() {
@@ -704,6 +917,8 @@
       tabEditorBtn.style.display = 'none';
       tabReviewsBtn.classList.remove('active');
       tabGalleryBtn.classList.add('active');
+      viewPromos.style.display = 'none';
+      tabPromosBtn.classList.remove('active');
       loadGallery();
     }
     tabListBtn.addEventListener('click', showListView);
